@@ -1,0 +1,1792 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Auxílio-Saúde</title>
+<meta name="theme-color" content="#101B2C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Auxílio-Saúde">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#F5F7F8;--surface:#fff;--alt:#EEF2F3;--ink:#16232E;--soft:#5B6B75;--navy:#1C2E4A;--deep:#101B2C;
+  --teal:#2F8F82;--teal-soft:#E4F3F0;--amber:#B9790E;--amber-soft:#FBF0DC;--red:#B84139;--red-soft:#FBEAE8;
+  --good:#2F8F5B;--good-soft:#E4F3E9;--line:#DDE3E6;
+  --serif:Georgia,"Times New Roman",serif;--sans:-apple-system,"SF Pro Text","Segoe UI",system-ui,Roboto,Arial,sans-serif;
+  --st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);--sl:env(safe-area-inset-left,0px);--sr:env(safe-area-inset-right,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--sans)}
+button,input,select,textarea{font:inherit}
+input,select,textarea{font-size:16px}
+header{background:var(--deep);color:#fff;padding:calc(10px + var(--st)) calc(16px + var(--sr)) 10px calc(16px + var(--sl));position:sticky;top:0;z-index:5}
+header .marca{font-family:var(--serif);font-size:19px;font-weight:700}
+header .status{font-size:12px;color:#CFE8E3;min-height:16px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+main{max-width:760px;margin:0 auto;padding:14px calc(14px + var(--sr)) calc(90px + var(--sb)) calc(14px + var(--sl))}
+nav.inferior{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;padding:4px 4px calc(4px + var(--sb));z-index:6}
+nav.inferior button{flex:1;background:none;border:0;padding:6px 2px;color:var(--soft);font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer}
+nav.inferior button span{font-size:21px;line-height:1.1}
+nav.inferior button.ativo{color:var(--navy);font-weight:700}
+h1{font-family:var(--serif);font-size:23px;margin:2px 0 2px;color:var(--deep)}
+h2{font-family:var(--serif);font-size:17px;margin:0 0 8px;color:var(--deep)}
+.eyebrow{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--teal);font-weight:700}
+.desc{color:var(--soft);margin:0 0 12px;font-size:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.grade{display:grid;gap:10px}.g2{grid-template-columns:1fr 1fr}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;border-left:4px solid var(--teal)}
+.stat .r{font-size:12px;color:var(--soft)}.stat .v{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--deep)}
+.disp{border-radius:14px;padding:14px 16px;color:#fff;margin-bottom:12px}
+.disp.clicavel{cursor:pointer}
+.disp .ey{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:#CFE8E3;font-weight:700}
+.disp .v{font-family:var(--serif);font-size:30px;font-weight:700}
+.disp .p{font-weight:600;margin-top:6px;font-size:14px}
+.btn{border:1px solid transparent;border-radius:11px;padding:10px 14px;cursor:pointer;font-weight:600;background:var(--teal);color:#fff;text-align:center;display:inline-block}
+.btn:disabled{opacity:.5}
+a.btn{text-decoration:none}
+nav.inferior:empty{display:none}
+.login{max-width:420px;margin:24px auto 0}.login-card{text-align:center;padding:24px 20px}.login-card h1{margin:2px 0 8px}
+.btn.bloco.entrar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;padding:12px 14px;font-size:15px}
+.linkbtn{background:none;border:0;color:var(--teal);font-weight:600;margin-top:14px;cursor:pointer;font-size:14px;text-decoration:underline}
+.conta{display:flex;align-items:center;gap:12px}.conta .nome{font-weight:700}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--teal-soft);color:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex:0 0 auto}
+.btn.navy{background:var(--navy)}.btn.out{background:#fff;color:var(--navy);border-color:var(--line)}
+.btn.perigo{background:#fff;color:var(--red);border-color:#F0C2BE}.btn.peq{padding:6px 10px;font-size:13px}
+.btn.bloco{display:block;width:100%}
+.linha{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.acoes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.meses{display:flex;gap:6px;overflow-x:auto;margin:10px 0 12px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.meses button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 12px;color:var(--soft)}
+.meses button.cheio{border-color:var(--teal);color:var(--teal);font-weight:600}
+.meses button.ativo{background:var(--navy);border-color:var(--navy);color:#fff}
+.item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.item:last-child{border-bottom:0}
+.item .esq{flex:1;min-width:0}.item .top{font-size:12px;color:var(--soft)}
+.item .nome{font-size:14.5px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.item .val{font-weight:700;white-space:nowrap;text-align:right}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--soft);text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.click{cursor:pointer}td.num,th.num{text-align:right;white-space:nowrap}
+.tag{display:inline-block;font-size:11px;font-weight:600;border-radius:20px;padding:1px 7px;margin:2px 3px 0 0;white-space:nowrap}
+.t0{background:var(--good-soft);color:#1E6B42}.t1{background:var(--amber-soft);color:#7A5209}.t2{background:var(--red-soft);color:#7D2B25}.t3{background:var(--alt);color:var(--navy)}
+.banner{border-radius:11px;padding:10px 12px;margin-bottom:10px;display:flex;gap:10px;align-items:center;font-size:14px}
+.b0{background:var(--teal-soft);border:1px solid #CFE8E3;color:#1C5F56}.b1{background:var(--amber-soft);border:1px solid #F0DBA9;color:#7A5209}.b2{background:var(--red-soft);border:1px solid #F0C2BE;color:#7D2B25}
+.banner span{flex:1}
+label.campo{display:block;font-size:12.5px;color:var(--soft);font-weight:600;margin-bottom:10px}
+label.campo input,label.campo select,label.campo textarea{display:block;width:100%;margin-top:3px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.soma{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.barra{height:8px;background:var(--alt);border-radius:6px;overflow:hidden;margin:3px 0 10px}.barra i{display:block;height:100%;background:var(--teal)}
+dialog{border:0;border-radius:18px;padding:0;width:min(640px,96vw);max-height:92vh;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(16,27,44,.45)}
+.dlg-cab{background:var(--navy);color:#fff;padding:13px 16px;font-family:var(--serif);font-size:17px;font-weight:700}
+.dlg-corpo{padding:14px 16px;overflow:auto;max-height:calc(92vh - 130px)}
+.dlg-pe{padding:10px 16px calc(10px + var(--sb));border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.itens td{padding:4px}
+.muted{color:var(--soft)}.pos{color:var(--good)}.neg{color:var(--red)}
+.vazio{text-align:center;color:var(--soft);padding:16px}
+dialog:focus,dialog form:focus,.dlg-corpo:focus{outline:none}
+.visor img{max-width:100%;border-radius:8px}
+.passos li{margin-bottom:6px}
+body.arrastando main{outline:3px dashed var(--teal);outline-offset:-8px;border-radius:16px}
+/* computador e tablet */
+@media (min-width:900px){
+  header{display:flex;align-items:baseline;gap:16px;padding-left:32px;padding-right:32px}
+  header .status{margin-left:auto}
+  nav.inferior{position:sticky;top:46px;bottom:auto;border-top:0;border-bottom:1px solid var(--line);justify-content:center;gap:6px;padding:4px 20px}
+  nav.inferior button{flex:0 0 auto;flex-direction:row;gap:8px;font-size:14.5px;padding:10px 18px;border-radius:10px}
+  nav.inferior button span{font-size:18px}
+  nav.inferior button.ativo{background:var(--teal-soft)}
+  main{max-width:1100px;padding:20px 32px 40px}
+  .acoes{grid-template-columns:1fr 1fr 1fr}.acoes .btn[style]{grid-column:auto!important}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .desktop-dica{display:block!important}
+}
+</style>
+</head>
+<body>
+<header><div class="marca">Auxílio-Saúde</div><div class="status" id="status"></div></header>
+<nav class="inferior" id="abas"></nav>
+<main id="app"></main>
+<input type="file" id="inpFoto" accept="image/*" capture="environment" hidden>
+<input type="file" id="inpArqs" accept="image/*,application/pdf" multiple hidden>
+<input type="file" id="inpJson" accept=".json,application/json" hidden>
+
+<dialog id="dlg"><form method="dialog" id="dlgForm">
+  <div class="dlg-cab" id="dlgTitulo">Lançamento</div>
+  <div class="dlg-corpo" id="dlgCorpo"></div>
+  <div class="dlg-pe" id="dlgPe"></div>
+</form></dialog>
+
+<script src="config.js"></script>
+<script>
+"use strict";
+const MESES=["","Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const CATEGORIAS=["Medicamento","Consulta","Exame","Psicólogo","Plano de saúde","Plano odontológico","Outro"];
+const ARQ_DADOS="dados_auxilio_saude.json";
+const EXT=[".pdf",".jpg",".jpeg",".png",".webp",".heic",".heif"];
+const fmt=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
+const moeda=v=>fmt.format(v||0);
+const num=v=>(Math.round((v||0)*100)/100).toFixed(2).replace(".",",");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const soDig=s=>String(s||"").replace(/\D/g,"");
+const nfc=s=>String(s||"").normalize("NFC");
+const anoMes=(a,m)=>a+"-"+String(m).padStart(2,"0");
+const dataBr=iso=>iso&&iso.length>=10?iso.slice(8,10)+"/"+iso.slice(5,7)+"/"+iso.slice(0,4):"";
+const uuid=()=>(crypto.randomUUID?crypto.randomUUID():"pc-"+Date.now()+"-"+Math.random().toString(16).slice(2));
+const agora=()=>Date.now();
+function parseValor(s){
+  s=String(s??"").replace(/[^\d,.\-]/g,"");if(!s)return 0;
+  if(s.includes(","))s=s.replace(/\./g,"").replace(",",".");
+  else if((s.match(/\./g)||[]).length>1)s=s.replace(/\./g,"");
+  const v=parseFloat(s);return isNaN(v)?0:Math.round(v*100)/100;
+}
+function dataIso(s){
+  s=String(s||"").trim();let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m)return m[1]+"-"+m[2].padStart(2,"0")+"-"+m[3].padStart(2,"0");
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if(m){let a=m[3].length===2?"20"+m[3]:m[3];return a+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0");}
+  return "";
+}
+/** Data possível para uma nota: do ano retrasado até 1 mês à frente (evita "ano 2000" lido errado). */
+function inicioAuxilio(){try{let m="";for(const l of D.lancamentos)if(!ehGasto(l)&&l.data&&l.data.length>=7&&(!m||l.data.slice(0,7)<m))m=l.data.slice(0,7);return m?m+"-01":"";}catch(e){return "";}}
+function dataPlausivel(iso){if(!iso||iso.length<10)return false;const h=new Date();let min=(h.getFullYear()-2)+"-01-01";const ini=inicioAuxilio();if(ini&&ini<min&&ini>"2010-01-01")min=ini;
+  const mx=new Date(h.getFullYear(),h.getMonth()+1,h.getDate());const max=mx.getFullYear()+"-"+String(mx.getMonth()+1).padStart(2,"0")+"-"+String(mx.getDate()).padStart(2,"0");return iso>=min&&iso<=max;}
+function normalizarCategoria(c){
+  const n=norm(c);for(const x of CATEGORIAS)if(norm(x)===n)return x;
+  if(/medicament|remedio|farmac/.test(n))return "Medicamento";if(n.includes("odont"))return "Plano odontológico";
+  if(n.includes("plano"))return "Plano de saúde";if(/psic|terap/.test(n))return "Psicólogo";
+  if(n.includes("consult"))return "Consulta";if(n.includes("exame"))return "Exame";return "Outro";
+}
+const ehComprovante=n=>{n=n.toLowerCase();return !n.startsWith(".")&&!n.startsWith("~")&&EXT.some(e=>n.endsWith(e));};
+function mimeDe(nome){nome=nome.toLowerCase();if(nome.endsWith(".pdf"))return "application/pdf";if(nome.endsWith(".png"))return "image/png";
+  if(nome.endsWith(".webp"))return "image/webp";if(nome.endsWith(".heic"))return "image/heic";if(nome.endsWith(".heif"))return "image/heif";return "image/jpeg";}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+// ======================================================================
+// configurações (neste aparelho)
+// ======================================================================
+/** Registro do app na Microsoft (Entra), com a plataforma "Aplicativo de página única" apontando para o endereço do app. */
+/** ID do aplicativo registrado no Microsoft Entra: preencha em config.js (ver README.md). */
+const MS_CLIENT_ID_WEB=String((window.AUX_CONFIG||{}).msClientId||"").trim();
+/** Venda: pede código de licença depois de alguns dias de teste. */
+const LICENCA_ATIVA=false;
+const DIAS_TESTE=7;
+const CONTATO="";
+/** Disponibilização e venda: dados mostrados ao usuário para comprar a licença (deixe "" para esconder o item). */
+const VENDA={
+  preco:"",          // ex.: "R$ 29,90"
+  modalidade:"",     // ex.: "licença anual" ou "licença vitalícia (pagamento único)"
+  pix:"",            // chave Pix (e-mail, telefone, CPF/CNPJ ou aleatória)
+  favorecido:"",     // nome que aparece no Pix
+  linkPagamento:"",  // link de checkout (Mercado Pago, PagSeguro, Hotmart…)
+  whatsapp:"",       // só números com DDI e DDD, ex.: "5585999999999"
+  email:"",          // e-mail para envio do comprovante e suporte
+  pagina:"privacidade.html#termos" // página com condições de uso
+};
+const CHAVE_PUBLICA="MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmztOMpZv0CVoXNEX5rD8ut/jphbl2kTJVyHYHShTOw7EvmAIwq4J5D44MTKVokwyuVUIn42I56D+StPFxI7qWA==";
+
+/** Prefixo próprio: no mesmo endereço do GitHub Pages, não mistura dados com outros apps publicados lá. */
+const LS="od_";
+const CFG_PADRAO={pastaApp:"Auxilio Saude",chave:"",modelo:"gemini-flash-latest",rapido:true,rpm:14,autoSinc:true,nuvem:"onedrive",msClientId:"",pastaNotas:"",lerAuto:true,organizar:true};
+let cfg={...CFG_PADRAO};
+try{cfg={...CFG_PADRAO,...JSON.parse(localStorage.getItem(LS+"aux_cfg")||"{}")};}catch(e){}
+cfg.nuvem="onedrive";   // esta versão usa só o OneDrive
+function salvarCfg(){try{localStorage.setItem(LS+"aux_cfg",JSON.stringify(cfg));}catch(e){}}
+const caminhoDados=()=>cfg.pastaApp+"/"+ARQ_DADOS;
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(LS+k);return v===null?d:v;}catch(e){return d;}};
+const lsSet=(k,v)=>{try{if(v===null)localStorage.removeItem(LS+k);else localStorage.setItem(LS+k,v);}catch(e){}};
+
+// IndexedDB: dados (kv) e fotos/PDFs das notas (arq)
+const DB={
+  _db:null,
+  abrir(){if(this._db)return Promise.resolve(this._db);return new Promise((ok,err)=>{const r=indexedDB.open("auxilio_pwa_onedrive",1);
+    r.onupgradeneeded=()=>{r.result.createObjectStore("kv");r.result.createObjectStore("arq");};
+    r.onsuccess=()=>{this._db=r.result;ok(r.result);};r.onerror=()=>err(r.error);});},
+  async get(s,k){try{const d=await this.abrir();return await new Promise(ok=>{const q=d.transaction(s).objectStore(s).get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>ok(null);});}catch(e){return null;}},
+  async set(s,k,v){const d=await this.abrir();await new Promise((ok,err)=>{const t=d.transaction(s,"readwrite");t.objectStore(s).put(v,k);t.oncomplete=ok;t.onerror=()=>err(t.error);});},
+  async del(s,k){try{const d=await this.abrir();await new Promise(ok=>{const t=d.transaction(s,"readwrite");t.objectStore(s).delete(k);t.oncomplete=ok;t.onerror=ok;});}catch(e){}}
+};
+// pede ao navegador para não apagar os dados do app
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
+
+function vazio(){return {lancamentos:[],pessoas:[{id:"titular",nome:"Titular",cpf:"",tipo:"Titular",plano:""}],recorrentes:[],vigencias:[],
+  recorrentesIgnorados:[],excluidos:{},arquivosIgnorados:[],cadastrosEm:0};}
+function novoLanc(t){return {id:uuid(),tipo:t||"GASTO",data:"",categoria:"Medicamento",estabelecimento:"",descricao:"",valor:0,valorDocumento:0,
+  cpf:"",consumidor:"",numeroNota:"",chaveAcesso:"",obs:"",criadoEm:agora(),alteradoEm:agora(),pessoaId:"",comprovado:false,recorrenteId:"",
+  conferir:false,itens:[],arquivos:[],enviados:[],publicos:[],publicosNomes:[],nuvem:[]};}
+function arrumarLanc(o){const l=Object.assign(novoLanc(o.tipo),o);l.valor=+l.valor||0;l.valorDocumento=+l.valorDocumento||0;
+  l.criadoEm=+o.criadoEm||0;l.alteradoEm=+o.alteradoEm||l.criadoEm;for(const k of ["itens","arquivos","enviados","publicos","publicosNomes","nuvem"])if(!Array.isArray(l[k]))l[k]=[];
+  if(o.comprovado===undefined)l.comprovado=false;return l;}
+function parseDados(txt){
+  txt=String(txt||"").replace(/^\uFEFF/,"").trim();if(!txt)return vazio();
+  const r=JSON.parse(txt);const d=vazio();
+  if(Array.isArray(r)){d.lancamentos=r.map(arrumarLanc);return d;}
+  d.lancamentos=Array.isArray(r.lancamentos)?r.lancamentos.map(arrumarLanc):[];
+  if(Array.isArray(r.pessoas)&&r.pessoas.length)d.pessoas=r.pessoas;
+  d.recorrentes=Array.isArray(r.recorrentes)?r.recorrentes:[];d.vigencias=r.vigencias||[];
+  d.recorrentesIgnorados=r.recorrentesIgnorados||[];d.excluidos=r.excluidos||{};d.arquivosIgnorados=r.arquivosIgnorados||[];
+  d.cadastrosEm=+r.cadastrosEm||0;
+  for(const id of (r.removerIds||[]))d.excluidos[id]=Math.max(d.excluidos[id]||0,agora());
+  if(!d.pessoas.some(p=>p.id==="titular"))d.pessoas.unshift({id:"titular",nome:"Titular",cpf:"",tipo:"Titular",plano:""});
+  return d;
+}
+function exportar(d){return {app:"Auxilio Saude",versao:2,origem:"computador",exportadoEm:agora(),lancamentos:d.lancamentos,vigencias:d.vigencias,
+  pessoas:d.pessoas,recorrentes:d.recorrentes,recorrentesIgnorados:d.recorrentesIgnorados,excluidos:d.excluidos,arquivosIgnorados:d.arquivosIgnorados,cadastrosEm:d.cadastrosEm};}
+function assinatura(d){
+  const m={};for(const l of d.lancamentos){const ex=d.excluidos[l.id];if(ex!==undefined&&ex>=l.alteradoEm)continue;m[l.id]=l.alteradoEm+":"+[...l.nuvem].sort().join("|");}
+  const ks=Object.keys(m).sort();
+  return JSON.stringify([ks.map(k=>k+"="+m[k]),Object.keys(d.excluidos).sort().map(k=>k+"="+d.excluidos[k]),[...d.arquivosIgnorados].sort(),d.cadastrosEm,[...d.recorrentesIgnorados].sort()]);
+}
+/** Junta r (nuvem) em d (este computador). Vale a versão alterada por último. */
+function mesclar(d,r){
+  let mudou=false;
+  for(const [id,ts] of Object.entries(r.excluidos||{}))if(!(d.excluidos[id]>=ts)){d.excluidos[id]=ts;}
+  d.lancamentos=d.lancamentos.filter(l=>{const ex=d.excluidos[l.id];if(ex!==undefined&&ex>=l.alteradoEm){for(const c of l.nuvem)if(!d.arquivosIgnorados.includes(c))d.arquivosIgnorados.push(c);mudou=true;return false;}return true;});
+  const porId=new Map(d.lancamentos.map(l=>[l.id,l]));
+  for(const rl of r.lancamentos){
+    const ex=d.excluidos[rl.id];if(ex!==undefined&&ex>=rl.alteradoEm)continue;
+    const a=porId.get(rl.id);
+    if(!a){d.lancamentos.push(rl);porId.set(rl.id,rl);mudou=true;}
+    else if(rl.alteradoEm>a.alteradoEm){const n=[...new Set([...rl.nuvem,...a.nuvem])];Object.assign(a,rl);a.nuvem=n;mudou=true;}
+    else for(const c of rl.nuvem)if(!a.nuvem.includes(c)){a.nuvem.push(c);mudou=true;}
+  }
+  for(const c of r.arquivosIgnorados||[])if(!d.arquivosIgnorados.includes(c)){d.arquivosIgnorados.push(c);mudou=true;}
+  {const ign=new Set(d.arquivosIgnorados);for(const l of d.lancamentos){const n=l.nuvem.filter(c=>!ign.has(c));if(n.length!==l.nuvem.length){l.nuvem=n;mudou=true;}}}
+  for(const c of r.recorrentesIgnorados||[])if(!d.recorrentesIgnorados.includes(c)){d.recorrentesIgnorados.push(c);mudou=true;}
+  if(r.cadastrosEm>d.cadastrosEm&&(r.pessoas.length||r.recorrentes.length)){d.pessoas=r.pessoas;d.recorrentes=r.recorrentes;d.cadastrosEm=r.cadastrosEm;mudou=true;}
+  return mudou;
+}
+function aplicarRecorrentes(d){
+  const hoje=new Date(),hj=anoMes(hoje.getFullYear(),hoje.getMonth()+1);
+  const exist=new Set(d.lancamentos.filter(l=>l.recorrenteId).map(l=>l.recorrenteId+"|"+(l.data||"").slice(0,7)));
+  let n=0;
+  for(const r of d.recorrentes){
+    if(!r.inicio||r.inicio.length<7||!(r.valor>0))continue;
+    let a=+r.inicio.slice(0,4),m=+r.inicio.slice(5,7);
+    for(let g=0;g<600;g++){
+      const k=anoMes(a,m);if(k>hj)break;if(r.fim&&r.fim.length>=7&&k>r.fim.slice(0,7))break;
+      const ch=r.id+"|"+k,id="rcr-"+r.id+"-"+k;
+      if(!exist.has(ch)&&!d.recorrentesIgnorados.includes(ch)&&d.excluidos[id]===undefined){
+        const l=novoLanc("GASTO");Object.assign(l,{id,data:k+"-01",categoria:r.categoria,descricao:r.descricao,valor:r.valor,pessoaId:r.pessoaId||"titular",
+          recorrenteId:r.id,obs:"Despesa recorrente — anexe o comprovante do mês",alteradoEm:l.criadoEm});
+        d.lancamentos.push(l);exist.add(ch);n++;
+      }
+      if(++m>12){m=1;a++;}
+    }
+  }
+  return n;
+}
+
+
+// ======================================================================
+// gravação local + sincronização com o OneDrive
+// ======================================================================
+let D=vazio();
+let mapa={};            // caminho no Drive -> chave do arquivo guardado neste aparelho
+let fila=Promise.resolve();
+let estado="";
+function setStatus(t){estado=t;const el=document.getElementById("status");if(el)el.innerHTML=t;}
+const hora=()=>new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+
+/** Arquivo que vai para a nuvem: sem as fotos que ainda só existem neste aparelho. */
+function exportarNuvem(d){
+  const e=exportar(d);e.origem="celular-web";
+  e.lancamentos=e.lancamentos.map(l=>({...l,nuvem:(l.nuvem||[]).filter(c=>!c.startsWith("local:"))}));
+  return e;
+}
+function salvarLocal(){
+  fila=fila.then(async()=>{await DB.set("kv","dados",JSON.stringify(exportar(D)));await DB.set("kv","mapa",mapa);})
+    .catch(e=>{setStatus("⚠ Não foi possível salvar neste aparelho: "+esc(e.message));});
+  return fila;
+}
+let timerSinc=null;
+function persistir(){
+  const p=salvarLocal();
+  if(NV.conectado()&&cfg.autoSinc){clearTimeout(timerSinc);timerSinc=setTimeout(()=>sincronizar(false),3000);}
+  return p;
+}
+
+// ---------------------------------------------------------------- fotos e PDFs guardados no aparelho
+async function guardarArquivo(blob,nome){
+  const id="local:"+uuid();
+  await DB.set("arq",id,{blob,nome:nome||"nota.jpg",mime:blob.type||mimeDe(nome||"")});
+  return id;
+}
+function nomeArquivo(c){return c.startsWith("local:")?"Arquivo deste aparelho (ainda não enviado)":c.split("/").pop();}
+async function guardarBaixado(cam,b){
+  const tipo=b.type&&b.type!=="application/octet-stream"?b.type:mimeDe(cam);
+  const blob=b.type===tipo?b:new Blob([b],{type:tipo});
+  const k="nuvem:"+uuid();await DB.set("arq",k,{blob,nome:cam.split("/").pop(),mime:tipo});
+  mapa[cam]=k;
+  return blob;
+}
+/** Devolve o arquivo (Blob): do aparelho ou, se preciso, baixa da nuvem e guarda. */
+async function obterArquivo(cam){
+  const chave=cam.startsWith("local:")?cam:mapa[cam];
+  if(chave){const r=await DB.get("arq",chave);if(r)return r.blob;}
+  if(cam.startsWith("local:")||!NV.conectado())return null;
+  if(!await NV.pronto(true))return null;
+  const it=await NV.item(cam);if(!it)return null;
+  const blob=await guardarBaixado(cam,await NV.baixar(it));
+  salvarLocal();
+  return blob;
+}
+/** Fotos ficam menores (mais rápido para a IA e para enviar). PDFs ficam como estão. */
+async function reduzir(file){
+  const nome=file.name||"foto.jpg";
+  if(/pdf/i.test(file.type)||/\.pdf$/i.test(nome))return {blob:file,nome};
+  try{
+    const bmp=await createImageBitmap(file);
+    const f=Math.min(1,1800/Math.max(bmp.width,bmp.height));
+    const c=document.createElement("canvas");c.width=Math.round(bmp.width*f);c.height=Math.round(bmp.height*f);
+    c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+    const b=await new Promise(ok=>c.toBlob(ok,"image/jpeg",.82));
+    if(b)return {blob:b,nome:nome.replace(/\.[A-Za-z0-9]{2,5}$/,"")+".jpg"};
+  }catch(e){}
+  return {blob:file,nome};
+}
+class Conflito extends Error{}
+const separar=c=>{const i=c.lastIndexOf("/");return i<0?["",c]:[c.slice(0,i),c.slice(i+1)];};
+
+/** fetch que tenta de novo quando a conexão cai no meio (troca de Wi-Fi/dados). */
+async function fetchRede(url,op){
+  for(let t=0;;t++){
+    try{return await fetch(url,op);}
+    catch(e){if(t>=2)throw new Error("A conexão com a internet caiu. Confira o Wi-Fi/dados e tente de novo.");await sleep(t?4000:1500);}
+  }
+}
+
+// ---------------------------------------------------------------- OneDrive (login Microsoft com PKCE, sem servidor)
+const GRAPH="https://graph.microsoft.com/v1.0",MS_AUTH="https://login.microsoftonline.com/common/oauth2/v2.0";
+const MS_ESCOPO="offline_access Files.ReadWrite User.Read";
+const clientIdMs=()=>(MS_CLIENT_ID_WEB||cfg.msClientId||"").trim();
+const redirMs=()=>location.origin+location.pathname.replace(/index\.html$/,"");
+const MS={token:null,exp:0};
+try{const t=JSON.parse(lsGet("ms_tok","null"));if(t&&t.exp>Date.now()+60000){MS.token=t.token;MS.exp=t.exp;}}catch(e){}
+const b64url=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+async function msTrocar(params){
+  const r=await fetch(MS_AUTH+"/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({client_id:clientIdMs(),scope:MS_ESCOPO,...params}).toString()});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||!j.access_token){
+    const m=j.error_description||j.error||("erro "+r.status);
+    if(/AADSTS9002326|AADSTS50011|redirect/i.test(m))throw new Error("No registro do app na Microsoft, adicione a plataforma \"Aplicativo de página única (SPA)\" com o endereço "+redirMs()+". Detalhe: "+m.split("\r\n")[0]);
+    if(j.error==="invalid_grant"){lsSet("ms_refresh",null);throw new Error("TOKEN");}
+    throw new Error("Microsoft: "+m.split("\r\n")[0]);
+  }
+  MS.token=j.access_token;MS.exp=Date.now()+(+j.expires_in||3600)*1000;
+  lsSet("ms_tok",JSON.stringify({token:MS.token,exp:MS.exp}));
+  if(j.refresh_token)lsSet("ms_refresh",j.refresh_token);
+  lsSet("ms_conectado","1");
+}
+/** Recebe o código do login (janela aberta pelo app, ou volta da página da Microsoft). */
+async function msConcluir(code,state){
+  if(state!==lsGet("ms_state",""))throw new Error("Resposta de login inválida. Tente de novo.");
+  await msTrocar({grant_type:"authorization_code",code,redirect_uri:redirMs(),code_verifier:lsGet("ms_verifier","")});
+  lsSet("ms_state",null);lsSet("ms_verifier",null);
+  try{const me=await (await fetch(GRAPH+"/me",{headers:{Authorization:"Bearer "+MS.token}})).json();lsSet("ms_conta",me.userPrincipalName||me.mail||"");lsSet("ms_nome",me.displayName||"");}catch(e){}
+}
+let msEspera=null;
+async function msEntrar(){
+  if(!clientIdMs())throw new Error("O login da Microsoft ainda não foi configurado neste app (Ajustes).");
+  const v=b64url(crypto.getRandomValues(new Uint8Array(48)));
+  const ch=b64url(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v)));
+  const st=b64url(crypto.getRandomValues(new Uint8Array(12)));
+  lsSet("ms_verifier",v);lsSet("ms_state",st);
+  const url=MS_AUTH+"/authorize?"+new URLSearchParams({client_id:clientIdMs(),response_type:"code",redirect_uri:redirMs(),response_mode:"query",
+    scope:MS_ESCOPO,code_challenge:ch,code_challenge_method:"S256",state:st,prompt:"select_account"}).toString();
+  const w=window.open(url,"auxilio_ms","width=480,height=720");
+  if(!w){location.href=url;return new Promise(()=>{});}   // sem janela: vai e volta pela própria página
+  return new Promise((ok,err)=>{
+    msEspera={ok,err};
+    const t=setInterval(()=>{if(w.closed&&msEspera){clearInterval(t);
+      setTimeout(()=>{if(msEspera){const e=msEspera;msEspera=null;MS.token?e.ok():e.err(new Error("A janela da Microsoft foi fechada antes de terminar."));}},800);}},700);
+  });
+}
+window.addEventListener("message",async e=>{
+  if(e.origin!==location.origin||!e.data||e.data.tipo!=="ms-codigo"||!msEspera)return;
+  const p=msEspera;msEspera=null;
+  if(!e.data.code){p.err(new Error("Microsoft: "+(e.data.erro||"login cancelado")));return;}
+  try{await msConcluir(e.data.code,e.data.state);p.ok();}catch(x){p.err(x);}
+});
+async function mfetch(url,op={}){
+  if(!(MS.token&&Date.now()<MS.exp-60000))throw new Error("TOKEN");
+  const r=await fetchRede(url,{...op,headers:{...(op.headers||{}),Authorization:"Bearer "+MS.token}});
+  if(r.status===401){MS.token=null;lsSet("ms_tok",null);throw new Error("TOKEN");}
+  return r;
+}
+const encCam=c=>c.split("/").filter(Boolean).map(encodeURIComponent).join("/");
+const ONEDRIVE={
+  nome:"OneDrive",
+  conectado:()=>lsGet("ms_conectado","")==="1",
+  async pronto(interativo){
+    if(MS.token&&Date.now()<MS.exp-60000)return true;
+    if(lsGet("ms_refresh","")){try{await msTrocar({grant_type:"refresh_token",refresh_token:lsGet("ms_refresh","")});return true;}catch(e){if(e.message!=="TOKEN"&&!interativo)throw e;}}
+    if(!interativo)return false;
+    await msEntrar();return true;
+  },
+  entrar:msEntrar,
+  async item(cam){
+    const r=await mfetch(GRAPH+"/me/drive/root:/"+encCam(cam));
+    if(r.status===404)return null;
+    const j=await r.json();if(!r.ok)throw new Error("OneDrive "+r.status+": "+(j.error&&j.error.message||""));
+    if(j.folder)return null;
+    return {id:j.id,nome:j.name,versao:j.eTag,url:j["@microsoft.graph.downloadUrl"]};
+  },
+  async baixar(it){
+    const r=it.url?await fetch(it.url):await mfetch(GRAPH+"/me/drive/items/"+it.id+"/content");
+    if(!r.ok)throw new Error("OneDrive "+r.status+" ao baixar");return await r.blob();
+  },
+  async enviar(cam,blob,mime,versao){
+    let r;
+    if(blob.size<=4*1024*1024){
+      const h={"Content-Type":mime};if(versao!==undefined)h["If-Match"]=versao;
+      r=await mfetch(GRAPH+"/me/drive/root:/"+encCam(cam)+":/content",{method:"PUT",headers:h,body:blob});
+      if(r.status===412)throw new Conflito("O arquivo mudou na nuvem.");
+    }else{
+      const s=await mfetch(GRAPH+"/me/drive/root:/"+encCam(cam)+":/createUploadSession",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({item:{"@microsoft.graph.conflictBehavior":"replace"}})});
+      const sj=await s.json();if(!s.ok)throw new Error("OneDrive "+s.status+": "+(sj.error&&sj.error.message||""));
+      r=await fetch(sj.uploadUrl,{method:"PUT",headers:{"Content-Range":"bytes 0-"+(blob.size-1)+"/"+blob.size},body:blob});
+    }
+    if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error("OneDrive "+r.status+": "+(j.error&&j.error.message||""));}
+  },
+  async listar(cam){
+    const out=[];let url=GRAPH+(cam?"/me/drive/root:/"+encCam(cam)+":/children":"/me/drive/root/children")+"?$top=200";
+    for(let g=0;g<100&&url;g++){
+      const r=await mfetch(url);const j=await r.json().catch(()=>({}));
+      if(r.status===404)throw new Error("Pasta não encontrada no OneDrive: "+cam);
+      if(!r.ok)throw new Error("OneDrive "+r.status+": "+(j.error&&j.error.message||""));
+      for(const f of j.value||[])out.push({nome:f.name,pasta:!!f.folder,arquivo:!!f.file,it:{id:f.id,nome:f.name,versao:f.eTag,url:f["@microsoft.graph.downloadUrl"]}});
+      url=j["@odata.nextLink"]||"";
+    }
+    return out;
+  },
+  podeLerPasta:()=>true,
+  async versoes(cam){const r=await mfetch(GRAPH+"/me/drive/root:/"+encCam(cam)+":/versions");if(r.status===404)return [];
+    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error("OneDrive "+r.status+": "+(j.error&&j.error.message||""));
+    return (j.value||[]).map(v=>({id:v.id,data:v.lastModifiedDateTime}));},
+  async baixarVersao(cam,v){const r=await mfetch(GRAPH+"/me/drive/root:/"+encCam(cam)+":/versions/"+encodeURIComponent(v.id)+"/content");if(!r.ok)throw new Error("OneDrive "+r.status+" ao ler versão antiga");return await r.text();},
+  async mover(de,para){
+    const [pn]=separar(para);let feito="";
+    for(const parte of pn.split("/").filter(Boolean)){const pai=feito;feito=feito?feito+"/"+parte:parte;
+      const g=await mfetch(GRAPH+"/me/drive/root:/"+encCam(feito));if(g.ok)continue;
+      const r=await mfetch(GRAPH+(pai?"/me/drive/root:/"+encCam(pai)+":/children":"/me/drive/root/children"),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:parte,folder:{},"@microsoft.graph.conflictBehavior":"fail"})});
+      if(!r.ok&&r.status!==409)throw new Error("OneDrive "+r.status);}
+    for(let k=1;k<20;k++){const alvo=k===1?para:comSufixo(para,k);const [pa,na]=separar(alvo);
+      const r=await mfetch(GRAPH+"/me/drive/root:/"+encCam(de),{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:na,parentReference:{path:"/drive/root:/"+pa}})});
+      if(r.status===409)continue;if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error("OneDrive "+r.status+": "+(j.error&&j.error.message||""));}
+      return alvo;}
+    throw new Error("Não foi possível renomear "+de);
+  },
+  sair(){MS.token=null;for(const k of ["ms_tok","ms_refresh","ms_conectado","ms_conta","ms_nome"])lsSet(k,null);}
+};
+const NV=ONEDRIVE;
+const comSufixo=(c,k)=>{const b=c.lastIndexOf("/"),p=c.lastIndexOf(".");return p<=b?c+" ("+k+")":c.slice(0,p)+" ("+k+")"+c.slice(p);};
+const pessoaNome=l=>!ehGasto(l)?"":!l.pessoaId?(soDig(l.cpf)?"outro CPF":"localizar CPF"):nomePessoa(l.pessoaId).replace(" (titular)","");
+/** Move e renomeia na nuvem as notas lidas da pasta para Comprovantes/ano/mês, como as lançadas pelo app. */
+/** Já está no padrão do app: <pasta>/Comprovantes/AAAA/MM - Mês/arquivo (ou "sem data"). */
+const jaOrganizado=c=>{const b=cfg.pastaApp+"/Comprovantes/";return c.startsWith(b)&&/^(\d{4}\/\d{2} - [^/]+|sem data)\/[^/]+$/.test(c.slice(b.length));};
+async function organizar(ids,log,opt={}){
+  const nossa=cfg.pastaApp+"/Comprovantes/";let n=0;
+  const lista=ids?D.lancamentos.filter(l=>ids.has(l.id)):D.lancamentos;
+  for(const l of lista){
+    if(!ehGasto(l))continue;const cams=[...l.nuvem];
+    for(let i=0;i<cams.length;i++){
+      const de=cams[i];if((!opt.forcar&&jaOrganizado(de))||de.startsWith("local:"))continue;
+      let ext=(de.toLowerCase().match(/\.[a-z0-9]{2,5}$/)||[".pdf"])[0];if(ext===".jpeg")ext=".jpg";
+      const d=l.data&&l.data.length>=7?l.data:"";
+      const sub=nossa+(d?d.slice(0,4)+"/"+d.slice(5,7)+" - "+MESES[+d.slice(5,7)]:"sem data");
+      const nome=limparNome((l.data||"sem-data")+" - "+l.categoria+(l.estabelecimento?" - "+l.estabelecimento.slice(0,40):"")+(pessoaNome(l)?" - "+pessoaNome(l):"")+" - R$ "+num(l.valor)+(cams.length>1?" ("+(i+1)+")":"")+(opt.forcar?" - "+l.id.slice(0,4):""))+ext;
+      if(de===sub+"/"+nome)continue;
+      try{log&&log("Organizando "+de.split("/").pop());const fim=await NV.mover(de,sub+"/"+nome);
+        l.nuvem[l.nuvem.indexOf(de)]=fim;if(mapa[de]){mapa[fim]=mapa[de];delete mapa[de];}
+        if(!D.arquivosIgnorados.includes(de))D.arquivosIgnorados.push(de);l.alteradoEm=agora();n++;}
+      catch(e){log&&log("⚠ "+e.message);}
+    }
+  }
+  if(n)await salvarLocal();
+  return n;
+}
+const pastaNotas=()=>(cfg.pastaNotas||"").replace(/^\/+|\/+$/g,"")||cfg.pastaApp;
+
+// ---------------------------------------------------------------- sincronização
+const limparNome=s=>String(s).replace(/[\\/:*?"<>|\n\r]+/g," ").replace(/\s+/g," ").trim().slice(0,120);
+/** Envia as fotos/PDFs que ainda só estão no aparelho. */
+async function enviarComprovantes(){
+  for(const l of D.lancamentos){
+    for(let i=0;i<l.nuvem.length;i++){
+      const c=l.nuvem[i];if(!c.startsWith("local:"))continue;
+      const r=await DB.get("arq",c);if(!r){l.nuvem.splice(i--,1);continue;}
+      const d=l.data&&l.data.length>=7?l.data:"";
+      const sub=cfg.pastaApp+"/Comprovantes/"+(d?d.slice(0,4)+"/"+d.slice(5,7)+" - "+MESES[+d.slice(5,7)]:"sem data");
+      const ext=((r.nome||"").match(/\.[A-Za-z0-9]{2,5}$/)||[/pdf/.test(r.mime)?".pdf":".jpg"])[0].toLowerCase();
+      const nome=limparNome((l.data||"sem-data")+" - "+(ehGasto(l)?(l.estabelecimento||l.categoria):"Recebimento")+" - R$ "+num(l.valor)+" - "+l.id.slice(0,4)+(i?"-"+i:""))+ext;
+      const cam=sub+"/"+nome;
+      setStatus("☁️ Enviando "+esc(nome));
+      await NV.enviar(cam,r.blob,r.mime||mimeDe(nome));
+      l.nuvem[i]=cam;mapa[cam]=c;
+    }
+  }
+  await salvarLocal();
+}
+let sincronizando=false;
+/** Junta com o arquivo da nuvem (celular, computador…), envia fotos novas, lê notas novas da pasta e grava de volta. */
+async function sincronizar(interativo,lerNotas){
+  if(sincronizando)return;
+  if(!NV.conectado()&&!interativo)return;
+  try{
+    if(!await NV.pronto(false)){
+      if(!interativo){ui.precisaLogin=true;render();return;}
+      await NV.pronto(true);
+    }
+  }catch(e){if(interativo&&e.message!=="TOKEN")alert(e.message);ui.precisaLogin=true;render();return;}
+  sincronizando=true;ui.precisaLogin=false;setStatus("☁️ Sincronizando com o "+NV.nome+"…");
+  try{
+    for(let t=0;t<3;t++){
+      const meta=await NV.item(caminhoDados());let sigR="";
+      if(meta){
+        const r=parseDados(await (await NV.baixar(meta)).text());
+        if(mesclar(D,r))render();
+        sigR=assinatura(r);
+      }
+      if(t===0){
+        if(aplicarRecorrentes(D))render();
+        await enviarComprovantes();
+        if(NV.podeLerPasta()&&(lerNotas||(cfg.lerAuto&&Date.now()-(+lsGet("ult_leitura","0"))>15*60000))){
+          lsSet("ult_leitura",String(Date.now()));
+          await lerPasta(t=>setStatus("📂 "+esc(t.slice(0,90))));
+        }
+        if(lerNotas){try{const r=await repararAnexos();if(r.rep)setStatus("📎 "+r.rep+" anexo(s) reencontrado(s) no "+NV.nome);}catch(e){}}
+      }
+      const nd=exportarNuvem(D);
+      if(assinatura(parseDados(JSON.stringify(nd)))===sigR)break;
+      try{setStatus("☁️ Gravando dados…");await NV.enviar(caminhoDados(),new Blob([JSON.stringify(nd,null,1)],{type:"application/json"}),"application/json",meta?meta.versao:undefined);break;}
+      catch(e){if(!(e instanceof Conflito)||t===2)throw e;}
+    }
+    await salvarLocal();lsSet("ultima_sinc",String(Date.now()));
+    setStatus("✔ Sincronizado com o "+NV.nome+" às "+hora());
+  }catch(e){
+    if(e.message==="TOKEN"){ui.precisaLogin=true;setStatus("☁️ Toque em Sincronizar para entrar de novo");}
+    else{setStatus("⚠ "+esc(e.message));if(interativo)alert(e.message);}
+  }finally{sincronizando=false;render();}
+}
+function desconectarNuvem(){NV.sair();lsSet("sessao","local");render();}
+
+// ---------------------------------------------------------------- sessão: login com a conta Microsoft (OneDrive)
+// Não há servidor: a conta da nuvem é a identidade. Cada pessoa entra com a própria conta e os dados ficam na nuvem dela.
+let instalador=null;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();instalador=e;if(typeof render==="function")render();});
+addEventListener("appinstalled",()=>{instalador=null;render();});
+const instaladoComoApp=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;}catch(e){return false;}};
+const ehIos=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+function sessaoAtiva(){
+  if(lsGet("sessao",""))return true;
+  // quem já usava o app antes da tela de login continua entrando direto
+  if(NV.conectado()||D.lancamentos.length){lsSet("sessao",NV.conectado()?cfg.nuvem:"local");return true;}
+  return false;
+}
+function contaAtual(){
+  const s=lsGet("sessao","");
+  if(s==="local"||!NV.conectado())return {tipo:"local",nome:"Sem conta",email:"Dados guardados só neste aparelho"};
+  return {tipo:"onedrive",nome:lsGet("ms_nome","")||"Conta Microsoft",email:lsGet("ms_conta","")};
+}
+async function entrar(tipo){
+  if(tipo==="local"){lsSet("sessao","local");lsSet("dica_drive","1");render();return;}
+  if(cfg.nuvem!==tipo){cfg.nuvem=tipo;salvarCfg();lsSet("ult_leitura",null);}
+  lsSet("sessao_pendente",tipo);   // Microsoft sem janela: o login volta recarregando a página
+  try{await NV.pronto(true);}catch(e){lsSet("sessao_pendente",null);alert(e.message);render();return;}
+  await concluirEntrada();
+}
+async function concluirEntrada(){
+  lsSet("sessao_pendente",null);lsSet("sessao",cfg.nuvem);lsSet("dica_drive","1");
+  ui.aba="mes";render();
+  await sincronizar(true,true);
+}
+function sair(){
+  const c=contaAtual(),local=c.tipo==="local";
+  dialogo("Sair",local
+    ?`<p style="margin-top:0">Sem uma conta, os lançamentos e as fotos existem só neste aparelho. Ao sair, eles são <b>apagados</b>.</p><p>Baixe uma cópia antes, se quiser guardar.</p>`
+    :`<p style="margin-top:0">Antes de sair, o app sincroniza com o ${NV.nome}${c.email?" (<b>"+esc(c.email)+"</b>)":""}.</p><p>Depois apaga deste aparelho os lançamentos, as fotos e as configurações. Tudo continua guardado na sua nuvem e volta quando você entrar de novo, aqui ou em outro aparelho.</p>`,
+    [["Cancelar","out"],
+     ...(local?[["Baixar cópia","out",()=>{baixar("dados_auxilio_saude_copia.json",JSON.stringify(exportarNuvem(D),null,1),"application/json");return false;}]]:[]),
+     ["Sair","perigo",async()=>{
+      if(!local){
+        const t0=Date.now();await sincronizar(true);
+        if(+lsGet("ultima_sinc","0")<t0){alert("Não foi possível sincronizar com o "+NV.nome+". Para não perder lançamentos, confira a internet e tente sair de novo.");return false;}
+      }
+      await limparAparelho();render();scrollTo(0,0);
+    }]]);
+}
+/** Apaga deste aparelho os dados da pessoa que saiu (a nuvem dela não é tocada). */
+async function limparAparelho(){
+  try{NV.sair();}catch(e){}
+  for(const k of ["sessao","sessao_pendente","ultima_sinc","ult_leitura","procura_ok","dica_drive","aux_cfg"])lsSet(k,null);
+  await DB.del("kv","dados");await DB.del("kv","mapa");
+  try{const db=await DB.abrir();await new Promise(ok=>{const t=db.transaction("arq","readwrite");t.objectStore("arq").clear();t.oncomplete=ok;t.onerror=ok;});}catch(e){}
+  cfg={...CFG_PADRAO};D=vazio();mapa={};
+  ui={...ui,aba:"mes",busca:"",soConferir:false,precisaLogin:false,semAnexo:[]};setStatus("");
+}
+function botaoInstalar(){
+  if(instaladoComoApp())return "";
+  if(instalador)return `<button class="btn navy bloco" onclick="instalarAtalho()">📲 Instalar o atalho na tela inicial</button>`;
+  return `<ol class="passos" style="padding-left:18px;margin:0">${ehIos()
+    ?`<li>Abra este endereço no <b>Safari</b>.</li><li>Toque em <b>Compartilhar</b> (quadrado com seta para cima).</li><li>Escolha <b>Adicionar à Tela de Início</b>.</li>`
+    :`<li><b>Android:</b> no Chrome, menu ⋮ → <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li><li><b>Computador:</b> no Chrome ou no Edge, clique no ícone de instalar na barra de endereço.</li>`}</ol>`;
+}
+async function instalarAtalho(){if(!instalador)return;instalador.prompt();try{await instalador.userChoice;}catch(e){}instalador=null;render();}
+const MS_ICONE='<svg width="16" height="16" viewBox="0 0 21 21" aria-hidden="true"><path fill="#F25022" d="M1 1h9v9H1z"/><path fill="#7FBA00" d="M11 1h9v9h-9z"/><path fill="#00A4EF" d="M1 11h9v9H1z"/><path fill="#FFB900" d="M11 11h9v9h-9z"/></svg>';
+function renderLogin(){
+  return `<div class="login">
+   <div class="card login-card"><img src="icon-192.png" alt="" width="64" height="64" style="border-radius:16px">
+    <div class="eyebrow" style="margin-top:10px">Gratuito</div>
+    <h1>Entre para começar</h1>
+    <p class="muted" style="margin-top:0">Controle o auxílio-saúde: fotografe as notas, acompanhe o saldo do mês e tenha os comprovantes organizados para a prestação de contas.</p>
+    <button class="btn out bloco entrar" onclick="entrar('onedrive')">${MS_ICONE}<span>Entrar com Microsoft</span></button>
+    ${clientIdMs()?"":`<div class="banner b1" style="margin-top:10px;text-align:left"><span>O login da Microsoft ainda não foi configurado. Cole abaixo o ID do aplicativo registrado no portal Entra.</span></div>
+      <label class="campo" style="text-align:left">ID do aplicativo da Microsoft<input value="${esc(cfg.msClientId)}" placeholder="00000000-0000-0000-0000-000000000000" onchange="cfg.msClientId=this.value.trim();salvarCfg();render()"></label>`}
+    <p class="muted" style="font-size:13px;margin:12px 0 0">Use uma conta Microsoft pessoal (Outlook, Hotmail, Live) ou de trabalho. Seus dados ficam no <b>seu</b> OneDrive, numa pasta chamada "${esc(cfg.pastaApp)}". O app não tem servidor e não vê seus dados. Assim, você usa no celular e no computador com as mesmas informações.</p>
+    <button class="linkbtn" onclick="entrar('local')">Usar sem conta (só neste aparelho)</button>
+   </div>
+   ${instaladoComoApp()?"":`<div class="card"><h2>📲 Ter o app na tela inicial</h2><p class="muted" style="margin-top:0">Não precisa de loja de aplicativos: o atalho abre o Auxílio-Saúde como um app, em tela cheia.</p>${botaoInstalar()}</div>`}
+   <p class="muted" style="font-size:12px;text-align:center">Ao entrar, você concorda com os <a href="privacidade.html#termos" target="_blank" rel="noopener">Termos de Serviço</a> e a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</p>
+  </div>`;
+}
+function cardConta(){
+  const c=contaAtual();
+  return `<div class="card"><h2>👤 Conta</h2><div class="conta"><div class="avatar">${esc((c.nome||"?").trim().charAt(0).toUpperCase())}</div>
+    <div style="flex:1;min-width:0"><div class="nome">${esc(c.nome)}</div><div class="muted" style="font-size:13px;overflow:hidden;text-overflow:ellipsis">${esc(c.email)}${c.tipo!=="local"?" · "+NV.nome:""}</div></div>
+    <button class="btn out peq" onclick="sair()">Sair</button></div></div>`;
+}
+
+// ---------------------------------------------------------------- leitura da pasta de notas do OneDrive
+let lendo=false;
+async function listarNotas(cam,nivel,saida){
+  for(const f of await NV.listar(cam)){
+    const c=nfc(cam?cam+"/"+f.nome:f.nome);
+    if(f.pasta){if(nivel<6)await listarNotas(c,nivel+1,saida);}
+    else if(f.arquivo&&ehComprovante(f.nome))saida.push({cam:c,nome:f.nome,it:f.it});
+  }
+  return saida;
+}
+async function lerPasta(log){
+  if(lendo)return;lendo=true;
+  try{
+    log("Procurando notas em "+pastaNotas()+"…");
+    let todos=await listarNotas(pastaNotas(),0,[]);
+    const pn=pastaNotas(),pa=cfg.pastaApp;
+    if(pn!==pa&&!pa.startsWith(pn+"/")){try{todos=todos.concat(await listarNotas(pa,0,[]));}catch(e){}}
+    {const vis=new Set();todos=todos.filter(f=>!vis.has(f.cam)&&vis.add(f.cam));}
+    const conh=conhecidos();
+    let novos=todos.filter(f=>!conh.has(f.cam));
+    log(todos.length+" nota(s) na pasta; "+novos.length+" ainda não lançada(s).");
+    if(!novos.length)return;
+    const res={lidos:0,ligados:0,repetidos:0};const org=new Set();
+    const paraLer=[];
+    for(const f of novos){const antigo=porNomeOriginal(f.nome);
+      if(!antigo){paraLer.push(f);continue;}
+      antigo.nuvem.push(f.cam);antigo.comprovado=true;antigo.alteradoEm=agora();res.ligados++;org.add(antigo.id);
+      log("🔗 "+f.nome+" → lançamento já existente");}
+    let lista=paraLer;const ia=!!cfg.chave;
+    if(ia&&lista.length>100){log((lista.length-100)+" nota(s) ficam para a próxima leitura.");lista=lista.slice(0,100);}
+    const intervalo=ia?60000/Math.max(2,+cfg.rpm||14):0;let proximo=0,parou=false,ativos=0;const espera=[];
+    const limitar=fn=>new Promise((ok,err)=>{const go=()=>{ativos++;fn().then(ok,err).finally(()=>{ativos--;const n=espera.shift();if(n)n();});};ativos<4?go():espera.push(go);});
+    const ps=lista.map(f=>limitar(async()=>{
+      const blob=await guardarBaixado(f.cam,await NV.baixar(f.it));
+      let l=novoLanc("GASTO"),como="";
+      if(ia&&!parou){const a=Date.now(),vez=Math.max(a,proximo);proximo=vez+intervalo;if(vez>a)await sleep(vez-a);}
+      try{como=await lerNota(blob,f.nome,l,ia&&!parou,!!cfg.rapido);}
+      catch(e){if(!parou){parou=true;log("⚠ A IA parou ("+e.message+"). As demais serão lidas sem IA.");}l=novoLanc("GASTO");como=await lerNota(blob,f.nome,l,false);}
+      return {f,l,como};
+    }));
+    for(let k=0;k<ps.length;k++){
+      let r;try{r=await ps[k];}catch(e){log("⚠ "+e.message);continue;}
+      const {f,l,como}=r;
+      if(l._plano){const r=aplicarPlano(l._plano,mensalidadesPlano(l._plano));D.arquivosIgnorados.push(f.cam);
+        if(cfg.organizar&&!f.cam.startsWith(cfg.pastaApp+"/Extratos do plano/")){try{const fim=await NV.mover(f.cam,cfg.pastaApp+"/Extratos do plano/"+limparNome("Extrato "+operadoraPlano(l._plano)+" "+(l._plano.titular||""))+(f.cam.toLowerCase().match(/\.[a-z0-9]{2,5}$/)||[".pdf"])[0]);D.arquivosIgnorados.push(fim);}catch(e){}}
+        log("🏥 "+f.nome+" é extrato do plano de saúde → "+r.texto);continue;}
+      if(l._ficha){const n=aplicarFicha(mesesFicha(l._ficha));D.arquivosIgnorados.push(f.cam);
+        if(cfg.organizar&&!f.cam.startsWith(cfg.pastaApp+"/Fichas financeiras/")){try{const anos=[...new Set(mesesFicha(l._ficha).map(x=>x.ano))].join("-");const fim=await NV.mover(f.cam,cfg.pastaApp+"/Fichas financeiras/Ficha financeira "+anos+(f.cam.toLowerCase().match(/\.[a-z0-9]{2,5}$/)||[".pdf"])[0]);D.arquivosIgnorados.push(fim);}catch(e){}}log("📄 "+f.nome+" é ficha financeira → "+n+" mês(es) de auxílio recebido atualizado(s)");continue;}
+      const dups=possiveisDuplicados(l);
+      if(dups.length){const d0=dups[0];
+        if(!d0.nuvem.length){d0.nuvem.push(f.cam);d0.comprovado=true;d0.alteradoEm=agora();res.ligados++;}
+        else{D.arquivosIgnorados.push(f.cam);res.repetidos++;}
+        continue;}
+      const alvo=semComprovantePara(l);if(alvo){ligarComprovante(alvo,l,f.cam,"lido da pasta");res.ligados++;org.add(alvo.id);log("🔗 "+f.nome+" → comprova o gasto de "+(alvo.data?dataBr(alvo.data):"sem data")+" ("+moeda(alvo.valor)+")");continue;}
+      const par=parecidas(l);if(par.length)l.obs="⚠ Pode ser repetida de "+(par[0].data?dataBr(par[0].data):"um lançamento sem data")+" ("+moeda(par[0].valor)+")"+(l.obs?" — "+l.obs:"");
+      l.nuvem=[f.cam];l.comprovado=true;l.conferir=true;
+      l.obs="Lido da pasta do "+NV.nome+" ("+(como||"sem dados — preencha")+"): "+f.cam+(l.obs?" — "+l.obs:"");
+      l.alteradoEm=agora();D.lancamentos.push(l);res.lidos++;org.add(l.id);
+      log("✔ ("+(k+1)+"/"+ps.length+") "+f.nome+" → "+(l.data?dataBr(l.data):"sem data")+" · "+moeda(l.valor));
+      if(res.lidos%10===0){await salvarLocal();render();}
+    }
+    if(cfg.organizar&&org.size){const n=await organizar(org,log);if(n)log("📂 "+n+" arquivo(s) organizado(s) em "+cfg.pastaApp+"/Comprovantes/ano/mês");}
+    await salvarLocal();
+    log("Pronto: "+res.lidos+" nova(s), "+res.ligados+" ligada(s) a lançamentos existentes, "+res.repetidos+" repetida(s).");
+    render();
+  }finally{lendo=false;}
+}
+
+// ---------------------------------------------------------------- licença (mesmo código do app Android)
+let LIC={liberado:true,licenciado:true,texto:""};
+const b64uDec=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return Uint8Array.from(atob(s),c=>c.charCodeAt(0));};
+async function verificarLicenca(codigo){
+  const c=String(codigo||"").replace(/\s+/g,"");
+  if(!c.startsWith("AS1-")||c.indexOf(".")<0)throw new Error("Código de licença inválido.");
+  const [d,s]=c.slice(4).split(".");
+  const dados=b64uDec(d),ass=b64uDec(s);
+  const k=await crypto.subtle.importKey("spki",b64uDec(CHAVE_PUBLICA),{name:"ECDSA",namedCurve:"P-256"},false,["verify"]);
+  if(ass.length!==64||!await crypto.subtle.verify({name:"ECDSA",hash:"SHA-256"},k,ass,dados))throw new Error("Código de licença inválido.");
+  const f=new TextDecoder().decode(dados).split("|");
+  const r={nome:f[0]||"",email:f[1]||"",validade:f[2]||""};
+  if(r.validade.length===8&&r.validade!=="00000000"){
+    const hj=new Date().toISOString().slice(0,10).replace(/-/g,"");
+    if(hj>r.validade)throw new Error("Esta licença venceu em "+r.validade.slice(6)+"/"+r.validade.slice(4,6)+"/"+r.validade.slice(0,4)+".");
+  }
+  return r;
+}
+async function atualizarLicenca(){
+  if(!LICENCA_ATIVA){LIC={liberado:true,licenciado:true,texto:""};return LIC;}
+  const cod=lsGet("licenca","")||(await DB.get("kv","licenca"))||"";
+  let motivo="";
+  if(cod){try{const d=await verificarLicenca(cod);
+    LIC={liberado:true,licenciado:true,texto:"Licenciado para "+d.nome+(d.validade.length===8&&d.validade!=="00000000"?" · válida até "+d.validade.slice(6)+"/"+d.validade.slice(4,6)+"/"+d.validade.slice(0,4):"")};return LIC;}
+    catch(e){motivo=e.message;}}
+  let ini=+lsGet("teste_inicio","0")||+(await DB.get("kv","teste_inicio"))||0;
+  if(!ini){ini=Date.now();lsSet("teste_inicio",String(ini));await DB.set("kv","teste_inicio",ini).catch(()=>{});}
+  const dias=Math.max(0,DIAS_TESTE-Math.floor((Date.now()-ini)/86400000));
+  LIC={liberado:dias>0,licenciado:false,dias,texto:motivo||(dias>0?"Teste grátis: "+dias+(dias===1?" dia restante":" dias restantes"):"O período de teste terminou")};
+  return LIC;
+}
+async function ativarLicenca(cod){
+  await verificarLicenca(cod);
+  const c=String(cod).replace(/\s+/g,"");lsSet("licenca",c);await DB.set("kv","licenca",c);
+  await atualizarLicenca();
+}
+
+function gravarLanc(l){
+  l.alteradoEm=Math.max(agora(),(l.alteradoEm||0)+1);
+  const i=D.lancamentos.findIndex(x=>x.id===l.id);
+  if(i>=0)D.lancamentos[i]=l;else D.lancamentos.push(l);
+  delete D.excluidos[l.id];
+  if(!l.pessoaId){const p=pessoaPorCpf(l.cpf);if(p)l.pessoaId=p.id;}
+  render();return persistir();
+}
+function excluirLanc(l){
+  D.lancamentos=D.lancamentos.filter(x=>x.id!==l.id);D.excluidos[l.id]=agora();
+  for(const c of l.nuvem)if(!D.arquivosIgnorados.includes(c))D.arquivosIgnorados.push(c);
+  if(l.recorrenteId&&l.data)D.recorrentesIgnorados.push(l.recorrenteId+"|"+l.data.slice(0,7));
+  render();return persistir();
+}
+function mudouCadastros(){D.cadastrosEm=agora();aplicarRecorrentes(D);render();return persistir();}
+const ehGasto=l=>l.tipo!=="RECEBIMENTO";
+const pessoa=id=>D.pessoas.find(p=>p.id===id);
+function pessoaPorCpf(c){const d=soDig(c);return d?D.pessoas.find(p=>soDig(p.cpf)===d):null;}
+function nomePessoa(id){if(!id)return "Não identificado";const p=pessoa(id);if(!p)return "Não identificado";
+  if(id==="titular")return !p.nome||p.nome==="Titular"?"Titular":p.nome+" (titular)";return p.nome;}
+function ordenados(){return [...D.lancamentos].sort((a,b)=>(b.data||"0000").localeCompare(a.data||"0000")||b.criadoEm-a.criadoEm);}
+function doMes(a,m){const k=anoMes(a,m);return ordenados().filter(l=>(l.data||"").slice(0,7)===k);}
+function resumo(lista){const r={recebido:0,comprovado:0,total:0,pendentes:0,qtd:0};
+  for(const l of lista){if(ehGasto(l)){r.total+=l.valor;r.qtd++;if(l.comprovado)r.comprovado+=l.valor;else r.pendentes++;}else r.recebido+=l.valor;}
+  r.saldo=r.recebido-r.comprovado;return r;}
+function saldoGeral(){
+  const s={recebido:0,gasto:0,comprovado:0,media:0,fixos:0,primeiro:""};const pm={};
+  for(const l of D.lancamentos){if(ehGasto(l)){s.gasto+=l.valor;if(l.comprovado)s.comprovado+=l.valor;}
+    else{s.recebido+=l.valor;const k=(l.data||"").slice(0,7);if(k)pm[k]=(pm[k]||0)+l.valor;}}
+  const ks=Object.keys(pm).sort();s.primeiro=ks[0]||"";const ult=ks.slice(-6);s.media=ult.length?ult.reduce((a,k)=>a+pm[k],0)/ult.length:0;
+  const h=new Date(),hj=anoMes(h.getFullYear(),h.getMonth()+1);
+  for(const r of D.recorrentes){if(r.inicio&&r.inicio>hj)continue;if(r.fim&&r.fim.length>=7&&r.fim.slice(0,7)<hj)continue;s.fixos+=+r.valor||0;}
+  s.disp=s.recebido-s.gasto;return s;
+}
+function possiveisDuplicados(l){
+  const ch=soDig(l.chaveAcesso);
+  return D.lancamentos.filter(o=>{
+    if(o.id===l.id||o.tipo!==l.tipo)return false;
+    if(ch.length>=20&&ch===soDig(o.chaveAcesso))return true;
+    if(l.numeroNota&&l.numeroNota.trim()===String(o.numeroNota||"").trim()&&l.data&&l.data===o.data)return true;
+    return !!l.data&&l.data===o.data&&Math.abs(l.valor-o.valor)<.005&&norm(l.estabelecimento)===norm(o.estabelecimento)&&!l.recorrenteId&&!o.recorrenteId;
+  });
+}
+function porNomeOriginal(nome){
+  const alvo="Arquivo original: "+nome;
+  return D.lancamentos.find(l=>{const o=l.obs||"";const i=o.indexOf(alvo);if(i<0)return false;const c=o.charAt(i+alvo.length);
+    if(c&&c!==" "&&c!=="\n")return false;return !l.nuvem.some(p=>p===nome||p.endsWith("/"+nome));});
+}
+function conhecidos(){const s=new Set(D.arquivosIgnorados);for(const l of D.lancamentos)for(const c of l.nuvem)s.add(c);return s;}
+function doNome(nome,l){
+  const b=nome.replace(/\.[A-Za-z0-9]{2,5}$/,"");let d="";
+  const ok=(a,m,dd)=>(m>=1&&m<=12&&dd>=1&&dd<=31&&a>=2015&&a<=2100)?a+"-"+String(m).padStart(2,"0")+"-"+String(dd).padStart(2,"0"):"";
+  let m=b.match(/(?<!\d)(20\d{2})[-_. ](\d{1,2})[-_. ](\d{1,2})(?!\d)/);if(m)d=ok(+m[1],+m[2],+m[3]);
+  if(!d){m=b.match(/(?<!\d)(\d{1,2})[-_. ](\d{1,2})[-_. ](20\d{2})(?!\d)/);if(m)d=ok(+m[3],+m[2],+m[1]);}
+  if(!d){m=b.match(/(?<!\d)(20\d{2})(\d{2})(\d{2})(?!\d)/);if(m)d=ok(+m[1],+m[2],+m[3]);}
+  if(!l.data&&d)l.data=d;
+  if(!(l.valor>0)){m=b.match(/R\$\s*([\d.]*\d,\d{2})/)||b.match(/(?<![\d,.])(\d{1,3}(?:\.\d{3})*,\d{2})(?![\d,])/);if(m)l.valor=parseValor(m[1]);}
+  const n=norm(b);let c="";
+  if(/nfc|farmac|drogar|medicament|remedio/.test(n))c="Medicamento";else if(/exame|laborat/.test(n))c="Exame";
+  else if(/psic|terap/.test(n))c="Psicólogo";else if(n.includes("odont"))c="Plano odontológico";
+  else if(/plano|unimed|hapvida/.test(n))c="Plano de saúde";else if(n.includes("consulta"))c="Consulta";
+  return c;
+}
+const PROMPT=`Você lê comprovantes de despesas de saúde do Brasil (cupom fiscal NFC-e, cupom SAT, nota fiscal de serviço NFS-e, recibo, boleto ou fatura de plano de saúde, recibo de psicólogo, pré-venda de farmácia).
+As imagens são páginas do MESMO documento. Extraia os dados e responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, neste formato:
+{
+  "tipo_documento": "NFC-e | SAT | NFS-e | Recibo | Boleto | Pré-venda | Outro",
+  "data": "AAAA-MM-DD (data de emissão; vazio se não aparecer)",
+  "estabelecimento": "nome fantasia ou razão social do emissor/prestador",
+  "cnpj": "",
+  "cpf_consumidor": "CPF do consumidor/tomador/paciente como aparece, vazio se não aparecer",
+  "nome_consumidor": "",
+  "numero_nota": "",
+  "chave_acesso": "44 dígitos se houver, sem espaços",
+  "categoria": "Medicamento | Consulta | Exame | Psicólogo | Plano de saúde | Plano odontológico | Outro",
+  "valor_total_pago": 0.00,
+  "descricao": "resumo curto (ex.: 'Consulta com ortopedista', 'Exames laboratoriais')",
+  "itens": [ {"descricao": "", "valor": 0.00, "medicamento": true} ],
+  "observacao": "avisos importantes (ex.: documento não fiscal, data ilegível, CPF de outra pessoa)"
+}
+Regras:
+- Farmácia: liste cada produto em 'itens'. O 'valor' do item é o valor do produto; se o próprio item mostrar desconto (ex.: 'De 26,16 por 20,93' ou 'desconto sobre item -5,23'), use o valor já com esse desconto. Não divida descontos gerais do cupom entre os itens.
+- 'medicamento' = true para remédios, vacinas (inclua a taxa de aplicação de vacina como true), fórmulas manipuladas, colírios, pomadas e sprays medicinais. false para cosméticos/dermocosméticos (ex.: Bepantol Derma, hidratantes, protetor), suplementos e vitaminas vendidos como suplemento (ex.: ômega 3, lactase, vitamina D/C suplemento), preservativos, testes de gravidez, higiene, curativos, seringas, acessórios e frete.
+- Consulta, exame, psicólogo e plano de saúde normalmente não têm itens; deixe 'itens' vazio.
+- Valores em número com ponto decimal (ex.: 1234.56). Se algo não estiver visível, deixe vazio ou 0.
+Se o documento NÃO for comprovante de despesa, mas uma FICHA FINANCEIRA, contracheque ou demonstrativo de pagamento do servidor, responda SOMENTE com: {"tipo_documento": "Ficha financeira", "auxilio_saude": [{"ano": 2025, "mes": 1, "valor": 0.00, "diferenca": 0.00}]} com um item por mês que tenha valor, usando apenas a linha de AUXÍLIO-SAÚDE (valor) e a linha de DIFERENÇA DE AUXÍLIO-SAÚDE (diferenca) daquele mês. Confira o mês de cada valor pela coluna do cabeçalho (JAN a DEZ) e o ano pelo título da tabela; ignore a coluna de total, o 13º e as demais rubricas. Se o documento for um EXTRATO DE PAGAMENTOS DE PLANO DE SAÚDE emitido pela operadora ou pela administradora (às vezes com o título "Ficha Financeira", mas com uma linha por mensalidade: beneficiário, vencimento, data de pagamento/recebimento, valor e competência), responda SOMENTE com: {"tipo_documento": "Extrato do plano de saude", "operadora": "", "administradora": "", "titular": "", "cpf_titular": "", "mensalidades": [{"competencia": "2025-03", "pagamento": "2025-04-01", "vencimento": "2025-03-30", "valor_pago": 0.00, "beneficiario": ""}]} com um item por linha de TODAS as páginas e anos. valor_pago = coluna "Vlr. Recebido" (ou valor pago); pagamento = coluna "Recebimento" (data em que foi pago), no formato AAAA-MM-DD; competencia no formato AAAA-MM. Ignore linhas sem pagamento e os totais. Não confunda com a ficha financeira do servidor (contracheque com rubricas como vencimento, descontos e AUXÍLIO-SAÚDE).`;
+function paraB64(blob){return new Promise((ok,err)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(",")[1]);r.onerror=()=>err(r.error);r.readAsDataURL(blob);});}
+function extrairJson(t){let s=String(t||"").trim();if(s.startsWith("```")){s=s.slice(s.indexOf("\n")+1);s=s.slice(0,s.lastIndexOf("```"));}
+  const i=s.indexOf("{"),j=s.lastIndexOf("}");if(i<0||j<=i)throw new Error("A IA não devolveu JSON.");return JSON.parse(s.slice(i,j+1));}
+async function iaLer(arquivo,nome,rapido){
+  if(!cfg.chave)throw new Error("Configure a chave do Gemini em Ajustes.");
+  const partes=[{text:PROMPT}];
+  if(arquivo){partes.push({inline_data:{mime_type:arquivo.type||mimeDe(nome||arquivo.name||""),data:await paraB64(arquivo)}});}
+  else partes[0]={text:"Responda apenas: OK"};
+  // sem "raciocínio" (thinking): para ler nota não precisa e a resposta vem bem mais rápido
+  const gc=arquivo?{temperature:0,responseMimeType:"application/json",...(window.__semThink?{}:{thinkingConfig:{thinkingBudget:0}})}:{temperature:0};
+  let corpo=JSON.stringify({contents:[{parts:partes}],generationConfig:gc});
+  const modelos=[...new Set([...(rapido?["gemini-flash-lite-latest"]:[]),cfg.modelo||"gemini-flash-latest","gemini-flash-latest","gemini-flash-lite-latest"])];
+  let ultimo="",ultSt=0,ultBody="";
+  fora:for(const m of modelos){
+    for(let t=0;t<3;t++){
+      let res;
+      try{res=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(m)+":generateContent?key="+encodeURIComponent(cfg.chave),
+        {method:"POST",headers:{"Content-Type":"application/json"},body:corpo});}
+      catch(e){ultimo="Sem conexão com o Google ("+e.message+")";ultSt=0;await sleep(t?4000:1500);continue;}
+      const bruto=await res.text().catch(()=>"");let j={};try{j=JSON.parse(bruto);}catch(e){}
+      if(res.ok){const txt=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("");return arquivo?extrairJson(txt):txt;}
+      ultSt=res.status;ultBody=bruto;ultimo="Gemini "+res.status+": "+(j.error?.message||"erro");
+      if(res.status===400&&gc.thinkingConfig){window.__semThink=true;delete gc.thinkingConfig;corpo=JSON.stringify({contents:[{parts:partes}],generationConfig:gc});t--;continue;}
+      if(res.status===429&&/PerDay/.test(bruto))break fora;
+      if(res.status===429||res.status===503||res.status===500||res.status===502||res.status===504){await sleep(5000*(t+1));continue;}
+      if(res.status===404)break;
+      throw new Error(ultimo);
+    }
+  }
+  const det=" (Google: "+ultimo.replace(/^Gemini \d+: /,"").slice(0,200)+")";
+  if(ultSt===429)throw new Error((/PerDay/.test(ultBody)
+    ?"Acabou a cota gratuita de HOJE do Gemini para esta chave. Ela volta por volta das 4h/5h da manhã (horário de Brasília)."
+    :"Muitas leituras seguidas: o limite gratuito do Gemini por minuto foi atingido. Espere 1 minuto e tente de novo.")
+    +" Dica: diminua \"Notas por minuto\" ou use o modelo gemini-flash-lite-latest."+det);
+  if(ultSt>=500)throw new Error("Os servidores do Gemini estão sobrecarregados agora (erro temporário do Google, não é o seu aparelho). Tente de novo em alguns minutos."+det);
+  if(!ultSt&&ultimo)throw new Error("Sem conexão com o Google: a internet caiu ou um bloqueador/VPN impediu o acesso. Confira a conexão e tente de novo.");
+  throw new Error(ultimo||"A IA não respondeu.");
+}
+function aplicarIA(j,l){
+  if(Array.isArray(j.mensalidades)&&!Array.isArray(j.auxilio_saude)){l._plano=j;return;}
+  if(/ficha/i.test(j.tipo_documento||"")&&Array.isArray(j.auxilio_saude)){l._ficha=j;return;}
+  let d=dataIso(j.data),dataRuim="";if(d&&!dataPlausivel(d)){dataRuim=d;d="";}if(d)l.data=d;
+  if((j.estabelecimento||"").trim())l.estabelecimento=j.estabelecimento.trim();
+  if((j.categoria||"").trim())l.categoria=normalizarCategoria(j.categoria);
+  l.cpf=String(j.cpf_consumidor??l.cpf).trim();l.consumidor=String(j.nome_consumidor??l.consumidor).trim();
+  l.numeroNota=String(j.numero_nota??l.numeroNota).trim();l.chaveAcesso=soDig(j.chave_acesso??l.chaveAcesso);
+  if((j.descricao||"").trim())l.descricao=j.descricao.trim();
+  const n=v=>typeof v==="number"?Math.round(v*100)/100:parseValor(v);
+  const total=n(j.valor_total_pago);l.valorDocumento=total;
+  l.itens=(Array.isArray(j.itens)?j.itens:[]).map(o=>({descricao:String(o.descricao||"").trim(),valor:n(o.valor),incluir:o.medicamento!==false}));
+  if(l.categoria==="Medicamento"&&l.itens.length){
+    l.valor=Math.round(l.itens.filter(i=>i.incluir).reduce((a,i)=>a+i.valor,0)*100)/100;
+    if(l.itens.every(i=>i.incluir)&&total>0)l.valor=total;
+    if(!l.descricao){const s=l.itens.filter(i=>i.incluir).map(i=>i.descricao).join(", ");l.descricao=s.length>120?s.slice(0,120)+"…":s;}
+  }else if(total>0)l.valor=total;
+  const o=[j.tipo_documento,j.observacao,dataRuim?"⚠ A IA leu a data "+dataBr(dataRuim)+", que parece errada. Confira a data.":""].map(x=>String(x||"").trim()).filter(Boolean).join(" — ");if(o)l.obs=o;
+  if(dataRuim)l.conferir=true;
+}
+/** Lê um arquivo e preenche o lançamento. Devolve como foi lido. */
+async function lerNota(arquivo,nome,l,usarIa,rapido){
+  const pelo={data:"",valor:0};const cat=doNome(nome,pelo);let como="";
+  if(usarIa){aplicarIA(await iaLer(arquivo,nome,rapido),l);como="IA";}
+  if(!l.data&&pelo.data)l.data=pelo.data;if(!(l.valor>0)&&pelo.valor>0)l.valor=pelo.valor;
+  if(!usarIa&&cat)l.categoria=cat;
+  if(!como&&(pelo.data||pelo.valor>0))como="nome do arquivo";
+  if(!l.descricao)l.descricao=nome.replace(/\.[A-Za-z0-9]{2,5}$/,"");
+  const p=pessoaPorCpf(l.cpf);if(p)l.pessoaId=p.id;
+  return como;
+}
+
+// ======================================================================
+// pasta de notas
+// ======================================================================
+function tags(l){
+  if(!ehGasto(l))return `<span class="tag t0">Recebimento</span>`;
+  let s="";if(l.conferir)s+=`<span class="tag t2">Conferir</span>`;
+  s+=l.comprovado?`<span class="tag t0">Comprovada</span>`:`<span class="tag t1">Sem comprovante</span>`;
+  if(l.recorrenteId)s+=`<span class="tag t3">Recorrente</span>`;if(l.nuvem.length)s+=`<span class="tag t3">📎 ${l.nuvem.length}</span>`;
+  if(!l.pessoaId)s+=`<span class="tag t2">${soDig(l.cpf)?"CPF não cadastrado":"sem CPF"}</span>`;return s;
+}
+function tabela(lista,vazioTxt){
+  if(!lista.length)return `<div class="vazio">${vazioTxt}</div>`;
+  return `<table><thead><tr><th>Data</th><th>Categoria · pessoa</th><th>Estabelecimento / descrição</th><th class="num">Valor</th><th></th></tr></thead><tbody>`+
+    lista.map(l=>`<tr class="click" onclick="editar('${l.id}')"><td>${l.data?dataBr(l.data):"<span class='muted'>sem data</span>"}</td>
+    <td>${esc(ehGasto(l)?l.categoria:"Auxílio recebido")}<br><span class="muted">${ehGasto(l)?esc(nomePessoa(l.pessoaId)):""}</span></td>
+    <td>${esc(l.estabelecimento||"")}${l.estabelecimento&&l.descricao?"<br>":""}<span class="muted">${esc(l.descricao||"")}</span></td>
+    <td class="num"><b class="${ehGasto(l)?"":"pos"}">${moeda(l.valor)}</b></td><td>${tags(l)}</td></tr>`).join("")+`</tbody></table>`;
+}
+function cardDisponivel(){
+  const s=saldoGeral(),pos=s.disp>=0,liq=s.media-s.fixos;
+  const desde=s.primeiro?" desde "+MESES[+s.primeiro.slice(5,7)].slice(0,3).toLowerCase()+"/"+s.primeiro.slice(0,4):"";
+  let p;
+  if(pos)p=s.media>0?"Auxílio médio: "+moeda(s.media)+"/mês"+(s.fixos>0?" · gastos fixos "+moeda(s.fixos)+"/mês":""):"Informe os valores recebidos em cada mês.";
+  else if(s.media<=0)p="Informe os valores recebidos para prever quando volta a sobrar.";
+  else if(liq<=0)p="Com os gastos fixos de "+moeda(s.fixos)+"/mês, o auxílio médio ("+moeda(s.media)+") não cobre a diferença.";
+  else{const m=Math.ceil(-s.disp/liq);const d=new Date();const jaRecebeu=resumo(doMes(d.getFullYear(),d.getMonth()+1)).recebido>0;d.setDate(1);d.setMonth(d.getMonth()+m-(jaRecebeu?0:1));
+    p="Com o auxílio médio de "+moeda(s.media)+"/mês"+(s.fixos>0?" e fixos de "+moeda(s.fixos):"")+", volta a sobrar dinheiro em "+MESES[d.getMonth()+1].toLowerCase()+"/"+d.getFullYear()+" ("+m+(m===1?" mês).":" meses).");}
+  return `<div class="disp" style="background:${pos?"var(--teal)":"var(--navy)"}"><div class="ey">${pos?"Quanto ainda posso gastar":"Gasto acima do recebido"}</div>
+  <div class="v">${moeda(Math.abs(s.disp))}</div><div style="color:#E4F3F0;font-size:13px">Soma de todos os meses${desde}: recebido ${moeda(s.recebido)} − gasto ${moeda(s.gasto)}</div>
+  <div class="p">${p}</div>${s.gasto-s.comprovado>.005?`<div style="color:#FBF0DC;font-size:12.5px">Sem comprovante: ${moeda(s.gasto-s.comprovado)}</div>`:""}
+  ${(()=>{const sd=D.lancamentos.filter(l=>ehGasto(l)&&!l.data).reduce((a,l)=>a+l.valor,0);return sd>.005?`<div style="color:#FBF0DC;font-size:12.5px;margin-top:4px">Inclui ${moeda(sd)} de gastos sem data, que não aparecem no relatório de nenhum mês. Eles estão listados no fim da aba Mês.</div>`:"";})()}</div>`;
+}
+function seletorAno(v,fn){return `<div class="linha"><button class="btn out" onclick="${fn}(-1)">‹</button><b style="font-family:var(--serif);font-size:21px;min-width:70px;text-align:center">${v}</b><button class="btn out" onclick="${fn}(1)">›</button></div>`;}
+function mudaAno(d){ui.ano+=d;render();}function mudaAnoHist(d){ui.anoHist+=d;render();}function mudaAnoPainel(d){ui.anoPainel+=d;render();}
+
+function conferirTodas(){for(const l of D.lancamentos)if(l.conferir){l.conferir=false;l.alteradoEm=agora();}ui.soConferir=false;render();persistir();}
+function salvarRecebido(){
+  const v=parseValor(document.getElementById("inpRec").value);const k=anoMes(ui.ano,ui.mes);
+  const recs=doMes(ui.ano,ui.mes).filter(l=>!ehGasto(l));
+  if(recs.length>1){alert("Este mês tem mais de um recebimento. Altere pela lista abaixo.");return;}
+  let l=recs[0];
+  if(!l){if(!(v>0))return;l=novoLanc("RECEBIMENTO");if(!D.lancamentos.some(x=>x.id==="rec-"+k))l.id="rec-"+k;
+    Object.assign(l,{data:k+"-01",descricao:"Auxílio saúde recebido",categoria:"Outro"});}
+  if(!(v>0)){excluirLanc(l);return;}
+  l.valor=v;gravarLanc(l);
+}
+function renderHistorico(){
+  let h=`<div class="eyebrow">Consolidado anual</div><h1>Histórico mensal</h1><p class="desc">Clique num mês para abrir o lançamento.</p>`+seletorAno(ui.anoHist,"mudaAnoHist");
+  let tot={recebido:0,comprovado:0,total:0,pendentes:0};
+  h+=`<div class="card" style="margin-top:12px"><table><thead><tr><th>Mês</th><th class="num">Recebido</th><th class="num">Comprovado</th><th class="num">Todas as despesas</th><th class="num">Saldo</th><th class="num">Sem comprovante</th></tr></thead><tbody>`;
+  for(let m=1;m<=12;m++){const r=resumo(doMes(ui.anoHist,m));for(const k in tot)tot[k]+=r[k];
+    h+=`<tr class="click" onclick="ui.ano=${ui.anoHist};ui.mes=${m};irPara('mes')"><td>${MESES[m]}</td><td class="num">${moeda(r.recebido)}</td><td class="num">${moeda(r.comprovado)}</td><td class="num">${moeda(r.total)}</td><td class="num ${r.saldo<0?"neg":""}">${moeda(r.saldo)}</td><td class="num">${r.pendentes||""}</td></tr>`;}
+  const s=tot.recebido-tot.comprovado;
+  h+=`<tr><td><b>Total</b></td><td class="num"><b>${moeda(tot.recebido)}</b></td><td class="num"><b>${moeda(tot.comprovado)}</b></td><td class="num"><b>${moeda(tot.total)}</b></td><td class="num ${s<0?"neg":""}"><b>${moeda(s)}</b></td><td class="num">${tot.pendentes||""}</td></tr></tbody></table></div>`;
+  h+=`<div class="card"><h2>Buscar em todos os lançamentos</h2><input id="busca" style="width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px" placeholder="Farmácia, CPF, nº da nota, valor…" value="${esc(ui.busca)}" oninput="ui.busca=this.value;ui.semData=false;atualizarBusca()"><div id="resBusca" style="margin-top:10px"></div></div>`;
+  setTimeout(atualizarBusca,0);return h;
+}
+function atualizarBusca(){
+  const el=document.getElementById("resBusca");if(!el)return;const q=norm(ui.busca);
+  let lista=ui.semData?D.lancamentos.filter(l=>!l.data):q?ordenados().filter(l=>norm([l.estabelecimento,l.descricao,l.categoria,l.cpf,l.numeroNota,l.obs,num(l.valor),nomePessoa(l.pessoaId),dataBr(l.data)].join(" ")).includes(q)):[];
+  el.innerHTML=(ui.semData||q)?tabela(lista.slice(0,300),"Nada encontrado."):"";
+}
+function renderPainel(){
+  const todo=ui.anoPainel===0;const lista=todo?D.lancamentos:D.lancamentos.filter(l=>(l.data||"").slice(0,4)===String(ui.anoPainel));
+  const r=resumo(lista);
+  let h=`<div class="eyebrow">Visão geral</div><h1>Painel</h1><p class="desc">${todo?"Todo o período (inclui lançamentos sem data).":"Ano de "+ui.anoPainel+"."}</p>
+  <div class="linha" style="margin-bottom:12px">${todo?"":seletorAno(ui.anoPainel,"mudaAnoPainel")}<button class="btn out" onclick="ui.anoPainel=${todo?hoje.getFullYear():0};render()">${todo?"Ver por ano":"Todo o período"}</button></div>`;
+  if(todo)h+=cardDisponivel();
+  h+=`<div class="grade g4" style="margin-bottom:14px">
+   <div class="stat"><div class="r">Recebido</div><div class="v">${moeda(r.recebido)}</div></div>
+   <div class="stat" style="border-left-color:var(--navy)"><div class="r">Comprovado</div><div class="v">${moeda(r.comprovado)}</div></div>
+   <div class="stat" style="border-left-color:var(--amber)"><div class="r">Todas as despesas</div><div class="v">${moeda(r.total)}</div></div>
+   <div class="stat" style="border-left-color:${r.saldo<0?"var(--red)":"var(--good)"}"><div class="r">Saldo (recebido − comprovado)</div><div class="v ${r.saldo<0?"neg":""}">${moeda(r.saldo)}</div></div></div>`;
+  const porCat={},porPes={};for(const l of lista)if(ehGasto(l)){porCat[l.categoria]=(porCat[l.categoria]||0)+l.valor;const n=nomePessoa(l.pessoaId);porPes[n]=(porPes[n]||0)+l.valor;}
+  const bloco=(t,o)=>{const e=Object.entries(o).sort((a,b)=>b[1]-a[1]);const mx=Math.max(1,...e.map(x=>x[1]));
+    return `<div class="card"><h2>${t}</h2>${e.length?e.map(([k,v])=>`<div class="linha" style="justify-content:space-between"><span>${esc(k)}</span><b>${moeda(v)}</b></div><div class="barra"><i style="width:${(v/mx*100).toFixed(1)}%"></i></div>`).join(""):"<div class='vazio'>Sem despesas.</div>"}</div>`;};
+  h+=`<div class="grade g2">${bloco("Por categoria",porCat)}${bloco("Por pessoa",porPes)}</div>`;
+  return h;
+}
+function salvarIa(){cfg.chave=document.getElementById("cfChave").value.trim();cfg.modelo=document.getElementById("cfModelo").value.trim()||"gemini-flash-latest";
+  cfg.rapido=document.getElementById("cfRapido").checked;cfg.rpm=Math.max(2,parseInt(document.getElementById("cfRpm").value)||14);salvarCfg();alert("Salvo.");render();}
+async function testarIa(){salvarIa();setStatus("Testando IA…");try{const r=await iaLer(null);alert("IA funcionando. Resposta: "+String(r).trim());}catch(e){alert("Falhou: "+e.message);}setStatus("");}
+
+// ---------------------------------------------------------------- pessoas e recorrentes
+function dialogo(titulo,corpo,botoes){
+  const d=document.getElementById("dlg");document.getElementById("dlgTitulo").textContent=titulo;
+  document.getElementById("dlgCorpo").innerHTML=corpo;const pe=document.getElementById("dlgPe");pe.innerHTML="";
+  for(const [txt,cls,fn] of botoes){const b=document.createElement("button");b.type="button";b.className="btn "+(cls||"");b.textContent=txt;
+    b.onclick=async()=>{if(fn){const r=await fn();if(r===false)return;}d.close();};pe.appendChild(b);}
+  d.showModal();
+  setTimeout(()=>{if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();},0);
+}
+const val=id=>document.getElementById(id).value;
+function editarPessoa(id){
+  const p=id?pessoa(id):{id:uuid().slice(0,13),nome:"",cpf:"",tipo:"Filho(a)",plano:""};
+  dialogo(id?"Pessoa":"Novo dependente",`<div class="cols"><label class="campo">Nome<input id="pNome" value="${esc(p.nome==="Titular"?"":p.nome)}"></label>
+   <label class="campo">CPF<input id="pCpf" value="${esc(p.cpf)}"></label><label class="campo">Tipo<input id="pTipo" value="${esc(p.tipo)}"></label>
+   <label class="campo">Plano de saúde<input id="pPlano" value="${esc(p.plano||"")}"></label></div>`,
+   [["Cancelar","out"],["Salvar","",()=>{p.nome=val("pNome").trim()||(p.id==="titular"?"Titular":"");p.cpf=val("pCpf").trim();p.tipo=val("pTipo").trim();p.plano=val("pPlano").trim();
+     if(!D.pessoas.includes(p))D.pessoas.push(p);for(const l of D.lancamentos)if(!l.pessoaId){const x=pessoaPorCpf(l.cpf);if(x)l.pessoaId=x.id;}mudouCadastros();}]]);
+}
+function excluirPessoa(id){if(!confirm("Excluir esta pessoa? Os lançamentos dela ficam como \"Não identificado\"."))return;
+  D.pessoas=D.pessoas.filter(p=>p.id!==id);for(const l of D.lancamentos)if(l.pessoaId===id){l.pessoaId="";l.alteradoEm=agora();}mudouCadastros();}
+function editarRecorrente(id){
+  const r=id?D.recorrentes.find(x=>x.id===id):{id:uuid().slice(0,13),pessoaId:"titular",categoria:"Plano de saúde",descricao:"",valor:0,inicio:anoMes(hoje.getFullYear(),hoje.getMonth()+1),fim:""};
+  dialogo(id?"Despesa recorrente":"Nova despesa recorrente",`<div class="cols"><label class="campo">Descrição<input id="rDesc" value="${esc(r.descricao)}"></label>
+   <label class="campo">Categoria<select id="rCat">${CATEGORIAS.map(c=>`<option ${c===r.categoria?"selected":""}>${c}</option>`).join("")}</select></label>
+   <label class="campo">Pessoa<select id="rPes">${D.pessoas.map(p=>`<option value="${p.id}" ${p.id===r.pessoaId?"selected":""}>${esc(nomePessoa(p.id))}</option>`).join("")}</select></label>
+   <label class="campo">Valor por mês<input id="rVal" value="${r.valor?num(r.valor):""}"></label>
+   <label class="campo">Início (mês)<input id="rIni" type="month" value="${esc(r.inicio)}"></label><label class="campo">Fim (vazio = continua)<input id="rFim" type="month" value="${esc(r.fim)}"></label></div>`,
+   [["Cancelar","out"],["Salvar","",()=>{r.descricao=val("rDesc").trim();r.categoria=val("rCat");r.pessoaId=val("rPes");r.valor=parseValor(val("rVal"));r.inicio=val("rIni");r.fim=val("rFim");
+     if(!(r.valor>0)||!r.inicio){alert("Informe valor e início.");return false;}if(!D.recorrentes.includes(r))D.recorrentes.push(r);mudouCadastros();}]]);
+}
+function excluirRecorrente(id){if(!confirm("Excluir a despesa recorrente? Os meses já lançados continuam."))return;D.recorrentes=D.recorrentes.filter(r=>r.id!==id);mudouCadastros();}
+
+// ---------------------------------------------------------------- editor de lançamento
+let editando=null;
+function editar(id){
+  const orig=id?D.lancamentos.find(l=>l.id===id):null;
+  editando=orig?JSON.parse(JSON.stringify(orig)):novoLanc("GASTO");
+  editando.conferir=false; // abrir e salvar = conferido (marque de novo se ainda faltar algo)
+  if(!orig)editando.data=anoMes(ui.ano,ui.mes)+"-"+String(Math.min(hoje.getDate(),28)).padStart(2,"0");
+  desenharEditor(!orig);
+}
+function desenharEditor(novo){
+  const l=editando,g=ehGasto(l);
+  const corpo=`<div class="cols">
+   <label class="campo">Tipo<select id="eTipo" onchange="lerEditor();editando.tipo=this.value;desenharEditor(${novo})"><option value="GASTO" ${g?"selected":""}>Despesa</option><option value="RECEBIMENTO" ${g?"":"selected"}>Recebimento do auxílio</option></select></label>
+   <label class="campo">Data<input id="eData" type="date" value="${esc(l.data)}"></label>
+   <label class="campo">Valor considerado<input id="eValor" value="${l.valor?num(l.valor):""}"></label>
+   ${g?`<label class="campo">Categoria<select id="eCat">${CATEGORIAS.map(c=>`<option ${c===l.categoria?"selected":""}>${c}</option>`).join("")}</select></label>
+   <label class="campo">Pessoa<select id="ePes"><option value="">Não identificado</option>${D.pessoas.map(p=>`<option value="${p.id}" ${p.id===l.pessoaId?"selected":""}>${esc(nomePessoa(p.id))}</option>`).join("")}</select></label>
+   <label class="campo">CPF na nota<input id="eCpf" value="${esc(l.cpf)}"></label>
+   <label class="campo">Estabelecimento<input id="eEst" value="${esc(l.estabelecimento)}"></label>
+   <label class="campo">Nº da nota<input id="eNum" value="${esc(l.numeroNota)}"></label>`:""}
+  </div>
+  <label class="campo">Descrição<input id="eDesc" value="${esc(l.descricao)}"></label>
+  ${g&&l.itens.length?`<div class="card" style="padding:10px"><b>Itens</b> <span class="muted">(desmarque o que não é remédio; o valor soma sozinho)</span>
+    <table class="itens">${l.itens.map((it,i)=>`<tr><td><input type="checkbox" ${it.incluir?"checked":""} onchange="editando.itens[${i}].incluir=this.checked;somarItens()"></td><td>${esc(it.descricao)}</td><td class="num">${moeda(it.valor)}</td></tr>`).join("")}</table></div>`:""}
+  ${g?`<div class="linha" style="margin-bottom:10px"><label><input type="checkbox" id="eComp" ${l.comprovado?"checked":""}> Comprovada (tem nota/recibo)</label>
+   <label><input type="checkbox" id="eConf" ${l.conferir?"checked":""}> Ainda falta conferir</label></div>`:""}
+  <label class="campo">Observação<textarea id="eObs" rows="2">${esc(l.obs)}</textarea></label>
+  <div class="card" style="padding:10px;margin:0"><b>Comprovantes</b>
+   ${l.nuvem.length?l.nuvem.map((c,i)=>`<div class="linha" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:5px 0"><span style="word-break:break-all">📎 ${esc(nomeArquivo(c))}${c.startsWith("local:")?"":`<br><span class="muted" style="font-size:12px">${esc(c)}</span>`}</span>
+     <span class="linha"><button type="button" class="btn out peq" onclick="abrirArquivo(editando.nuvem[${i}])">Abrir</button>${cfg.chave&&g?`<button type="button" class="btn peq" onclick="lerEditorIa(${i},${novo})">🤖 Ler com IA</button>`:""}
+     <button type="button" class="btn perigo peq" onclick="lerEditor();editando.nuvem.splice(${i},1);desenharEditor(${novo})">Tirar</button></span></div>`).join(""):`<div class="muted">Nenhum arquivo.</div>`}
+   <label class="btn out peq" style="display:inline-block;margin-top:8px">+ Anexar foto ou arquivo<input type="file" accept="image/*,application/pdf" hidden onchange="anexarNoEditor(this.files[0],${novo})"></label></div>`;
+  const bt=[["Cancelar","out"]];
+  if(!novo)bt.push(["Excluir","perigo",()=>{if(!confirm("Excluir este lançamento?"))return false;excluirLanc(D.lancamentos.find(x=>x.id===editando.id));}]);
+  bt.push(["Salvar","",()=>salvarEditor()]);
+  const d=document.getElementById("dlg");if(d.open)d.close();
+  dialogo(novo?(g?"Nova despesa":"Novo recebimento"):(g?"Despesa":"Recebimento"),corpo,bt);
+}
+function lerEditor(){
+  const l=editando,g=ehGasto(l),q=id=>document.getElementById(id);
+  l.data=q("eData").value;l.valor=parseValor(q("eValor").value);l.descricao=q("eDesc").value.trim();l.obs=q("eObs").value.trim();
+  if(g&&q("eCat")){l.categoria=q("eCat").value;l.pessoaId=q("ePes").value;l.cpf=q("eCpf").value.trim();l.estabelecimento=q("eEst").value.trim();
+    l.numeroNota=q("eNum").value.trim();l.comprovado=q("eComp").checked;l.conferir=q("eConf").checked;}
+}
+function somarItens(){const s=editando.itens.filter(i=>i.incluir).reduce((a,i)=>a+i.valor,0);document.getElementById("eValor").value=num(s);}
+function salvarEditor(){
+  lerEditor();const l=editando;
+  if(!(l.valor>0)&&!confirm("O valor está zerado. Salvar mesmo assim?"))return false;
+  if(ehGasto(l)){if(l.nuvem.length)l.comprovado=true;}else{l.itens=[];l.categoria="Outro";l.conferir=false;}
+  const orig=D.lancamentos.find(x=>x.id===l.id);
+  const dups=possiveisDuplicados(l);
+  if(dups.length&&!orig&&!confirm("Parece repetida de "+dataBr(dups[0].data)+" · "+moeda(dups[0].valor)+" · "+(dups[0].estabelecimento||dups[0].descricao)+". Salvar mesmo assim?"))return false;
+  gravarLanc(l);
+}
+function baixar(nome,conteudo,tipo){const u=URL.createObjectURL(new Blob([conteudo],{type:tipo}));const a=document.createElement("a");a.href=u;a.download=nome;a.click();setTimeout(()=>URL.revokeObjectURL(u),5000);}
+function baixarCsv(){
+  const c=s=>{s=String(s??"");return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+  let t="\uFEFFTipo;Ano;Mês;Data;Categoria;Pessoa;Estabelecimento;Descrição;Valor;Comprovado;Valor do documento;CPF na nota;Nº nota;Chave de acesso;Observação;Anexos\n";
+  for(const l of ordenados())t+=[ehGasto(l)?"Gasto":"Recebimento",(l.data||"").slice(0,4),l.data?MESES[+l.data.slice(5,7)]:"",dataBr(l.data),ehGasto(l)?l.categoria:"Auxílio recebido",
+    ehGasto(l)?nomePessoa(l.pessoaId):"",l.estabelecimento,l.descricao,num(l.valor),ehGasto(l)?(l.comprovado?"Sim":"Não"):"",l.valorDocumento?num(l.valorDocumento):"",l.cpf,l.numeroNota,l.chaveAcesso,l.obs,l.nuvem.length].map(c).join(";")+"\n";
+  baixar("auxilio_saude.csv",t,"text/csv");
+}
+
+
+// ======================================================================
+// ferramentas iguais às do app Android 4.16–4.20
+// ======================================================================
+/** Janela de progresso com botão Parar (vira Fechar no fim). */
+function progresso(titulo){
+  const st={parar:false,fim:false,txt:""};
+  st.log=t=>{st.txt+=t+"\n";const e=document.getElementById("progLog");if(e){e.textContent=st.txt;e.scrollTop=e.scrollHeight;}setStatus(esc(String(t).split("\n")[0].slice(0,90)));};
+  st.acabar=()=>{st.fim=true;const b=document.querySelector("#dlgPe button");if(b){b.textContent="Fechar";b.className="btn";}};
+  dialogo(titulo,`<div id="progLog" style="white-space:pre-wrap;font-size:13px;line-height:1.45;max-height:55vh;overflow:auto"></div>`,
+    [["Parar","perigo",()=>{if(st.fim)return;if(!st.parar){st.parar=true;st.log("⏹ Parando depois desta nota…");}return false;}]]);
+  return st;
+}
+/** Espaça as chamadas à IA conforme "Notas por minuto". */
+function ritmo(){const iv=60000/Math.max(2,+cfg.rpm||14);let prox=0;return async()=>{const a=Date.now(),v=Math.max(a,prox);prox=v+iv;if(v>a)await sleep(v-a);};}
+/** Lista de trabalho interrompida (continua de onde parou por 24 h). */
+function feitosGet(k){try{if(Date.now()-(+lsGet(k+"_em","0"))>864e5)return new Set();return new Set(JSON.parse(lsGet(k,"[]")));}catch(e){return new Set();}}
+function feitosSet(k,s){lsSet(k,JSON.stringify([...s]));lsSet(k+"_em",String(Date.now()));}
+function feitosLimpar(k){lsSet(k,null);lsSet(k+"_em",null);}
+/** Erro da IA que não adianta insistir (cota do dia, sem internet). */
+const iaParar=m=>/cota gratuita de HOJE|Sem conexão|internet caiu|chave|API key|403|401/i.test(m||"");
+const iaMinuto=m=>/por minuto/i.test(m||"");
+const textoLanc=l=>(l.data?dataBr(l.data):"sem data")+" · "+moeda(l.valor)+(l.estabelecimento?" · "+l.estabelecimento:"");
+
+/** Todas as notas da pasta do app (e da pasta de notas, se for outra), sem repetir. */
+async function todasNotasNuvem(){
+  let todos=await listarNotas(cfg.pastaApp,0,[]);const pn=pastaNotas();
+  if(NV.podeLerPasta()&&pn!==cfg.pastaApp&&!pn.startsWith(cfg.pastaApp+"/")){try{todos=todos.concat(await listarNotas(pn,0,[]));}catch(e){}}
+  const vis=new Set();return todos.filter(f=>!vis.has(f.cam)&&vis.add(f.cam));
+}
+
+// ---------------------------------------------------------------- anexos que mudaram de lugar
+/**
+ * Gastos comprovados cujo arquivo não está mais no caminho guardado (movido/renomeado em outro aparelho):
+ * procura pelo mesmo nome ou pelo nome no padrão do app (data … R$ valor). Os que não existem ficam em ui.semAnexo.
+ */
+async function repararAnexos(){
+  const todos=await todasNotasNuvem();if(!todos.length)return {rep:0,sem:[]};
+  const existe=new Set(todos.map(f=>f.cam));
+  const listado=c=>c.startsWith(cfg.pastaApp+"/")||c.startsWith(pastaNotas()+"/");
+  const usados=new Set(D.lancamentos.flatMap(l=>l.nuvem)),ign=new Set(D.arquivosIgnorados);
+  let rep=0;const sem=[];
+  for(const l of D.lancamentos){
+    if(!ehGasto(l)||!l.comprovado)continue;
+    if(l.nuvem.some(c=>c.startsWith("local:")||existe.has(c)||!listado(c)))continue;
+    let achado=null;
+    for(const v of l.nuvem){const b=v.split("/").pop();const f=todos.find(x=>!usados.has(x.cam)&&x.nome===b);if(f){achado=f.cam;break;}}
+    if(!achado&&l.data){const val="R$ "+num(l.valor);const c=todos.filter(x=>!usados.has(x.cam)&&!ign.has(x.cam)&&x.nome.startsWith(l.data)&&x.nome.includes(val));if(c.length===1)achado=c[0].cam;}
+    if(!achado){sem.push(l.id);continue;}
+    l.nuvem=l.nuvem.filter(c=>existe.has(c)||!listado(c));l.nuvem.push(achado);usados.add(achado);l.alteradoEm=agora();rep++;
+  }
+  ui.semAnexo=sem;
+  if(rep)await salvarLocal();
+  return {rep,sem};
+}
+function verSemAnexo(){
+  const ls=(ui.semAnexo||[]).map(id=>D.lancamentos.find(l=>l.id===id)).filter(Boolean);
+  dialogo("Comprovados sem arquivo na nuvem",`<p class="muted" style="margin-top:0">Estes gastos estão marcados como comprovados, mas o arquivo da nota não existe no ${NV.nome}. Abra cada um e anexe a foto/PDF, ou coloque a nota na pasta e sincronize.</p>`+
+    ls.map(l=>`<div class="item" onclick="document.getElementById('dlg').close();editar('${l.id}')"><div class="esq"><div class="nome">${esc(l.estabelecimento||l.categoria)}</div><div class="top">${l.data?dataBr(l.data):"sem data"}</div></div><div class="val">${moeda(l.valor)}</div></div>`).join(""),[["Fechar","out"]]);
+}
+
+// ---------------------------------------------------------------- lançamentos que sumiram (histórico de versões do Drive)
+async function recuperarSumidos(){
+  const st=progresso("Recuperar lançamentos que sumiram");
+  try{
+    if(!await NV.pronto(true)){st.acabar();return;}
+    st.log("Buscando o histórico de versões do arquivo de dados no "+NV.nome+"…");
+    const vs=await NV.versoes(caminhoDados());
+    st.log(vs.length+" versão(ões) anterior(es) encontrada(s).");
+    const atuais=new Set(D.lancamentos.map(l=>l.id)),m=new Map();
+    const n=Math.min(60,vs.length);
+    for(let i=0;i<n&&!st.parar;i++){
+      st.log("Lendo versão de "+new Date(vs[i].data).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})+" ("+(i+1)+"/"+n+")");
+      try{const d=parseDados(await NV.baixarVersao(caminhoDados(),vs[i]));
+        for(const l of d.lancamentos){if(atuais.has(l.id))continue;const x=m.get(l.id);if(x&&x.alteradoEm>=l.alteradoEm)continue;m.set(l.id,l);}}
+      catch(e){st.log("⚠ "+e.message);}
+    }
+    const lista=[...m.values()].sort((a,b)=>(b.data||"").localeCompare(a.data||""));
+    st.acabar();document.getElementById("dlg").close();
+    if(!lista.length){alert("Nenhum lançamento sumido foi encontrado nas versões anteriores do arquivo de dados.\n\nSe as notas tinham arquivo no "+NV.nome+", use \"🔎 Procurar notas não lançadas\".");return;}
+    window.__sum=lista;
+    const corpo=`<p class="muted" style="margin-top:0">Lançamentos que existiam antes e não existem mais. Os que você excluiu vêm desmarcados.</p>`+
+      lista.map((l,i)=>`<label class="item" style="gap:10px;align-items:flex-start"><input type="checkbox" id="sum${i}" ${D.excluidos[l.id]?"":"checked"}><div class="esq"><div class="nome">${esc(ehGasto(l)?(l.estabelecimento||l.categoria):"Auxílio recebido")}</div><div class="top">${l.data?dataBr(l.data):"sem data"}${D.excluidos[l.id]?" · (você excluiu)":""}</div></div><div class="val">${moeda(l.valor)}</div></label>`).join("");
+    dialogo(lista.length+" lançamento(s) de versões anteriores",corpo,[["Cancelar","out"],["Restaurar marcados","",async()=>{
+      const escolhidos=window.__sum.filter((l,i)=>document.getElementById("sum"+i)&&document.getElementById("sum"+i).checked);
+      document.getElementById("dlg").close();if(!escolhidos.length)return;
+      const ign=new Set(D.arquivosIgnorados);
+      for(const l of escolhidos){
+        delete D.excluidos[l.id];const novos=[];
+        for(const c of l.nuvem){
+          if(!ign.has(c)){novos.push(c);continue;}
+          try{setStatus("Recuperando anexo "+esc(c.split("/").pop()));if(await NV.item(c))novos.push(await NV.mover(c,cfg.pastaApp+"/Comprovantes/Recuperadas/"+c.split("/").pop()));}catch(e){}
+        }
+        l.nuvem=novos;l.alteradoEm=agora();D.lancamentos.push(l);
+      }
+      await persistir();render();await sincronizar(true);
+      alert(escolhidos.length+" lançamento(s) restaurado(s).");}]]);
+  }catch(e){st.log("⚠ "+e.message);st.acabar();}
+}
+
+// ---------------------------------------------------------------- reanalisar notas já lançadas
+function reanalisarNotas(){
+  if(!cfg.chave){alert("Configure a chave do Gemini primeiro (Leitura das notas por IA).");return;}
+  const feitos=feitosGet("reler_feitos");
+  const base=l=>ehGasto(l)&&l.nuvem.length&&!feitos.has(l.id);
+  const pend=D.lancamentos.filter(l=>base(l)&&(l.conferir||!l.data||!dataPlausivel(l.data)||!(l.valor>0)));
+  const todas=D.lancamentos.filter(base);
+  window.__rl={pend,todas};
+  dialogo("Reanalisar notas com IA",`<p class="muted" style="margin-top:0">Lê de novo com a IA as notas que já estão lançadas e corrige os dados. As que mudarem ficam marcadas "Conferir".</p>
+    <label class="item" style="gap:10px"><input type="radio" name="rl" id="rlPend" checked><div class="esq"><div class="nome">Só as que precisam de atenção (${pend.length})</div><div class="top">Conferir, sem data, data estranha ou sem valor</div></div></label>
+    <label class="item" style="gap:10px"><input type="radio" name="rl" id="rlTodas"><div class="esq"><div class="nome">Todas as notas com anexo (${todas.length})</div></div></label>`,
+    [["Cancelar","out"],["Começar","",()=>{const so=document.getElementById("rlPend").checked;setTimeout(()=>rodarReleitura(so?window.__rl.pend:window.__rl.todas),60);}]]);
+}
+async function rodarReleitura(lista){
+  if(!lista.length){alert("Nenhuma nota para ler.");return;}
+  if(!confirm("Ler "+lista.length+" nota(s)? Leva cerca de "+Math.ceil(lista.length/Math.max(2,+cfg.rpm||14))+" minuto(s) e usa a cota do Gemini. Deixe esta página aberta até terminar."))return;
+  if(NV.conectado()&&!await NV.pronto(true).catch(()=>false))return;
+  const st=progresso("Reanalisando notas"),espera=ritmo(),feitos=feitosGet("reler_feitos");
+  let lidos=0,mud=0,sem=0,fal=0,parou="",reTentou=false;
+  for(let i=0;i<lista.length;i++){
+    if(st.parar){parou="cancelado por você";break;}
+    const l=D.lancamentos.find(x=>x.id===lista[i].id);if(!l)continue;
+    st.log("("+(i+1)+"/"+lista.length+") "+textoLanc(l));
+    let b=null,nome="";
+    for(const c of l.nuvem){try{b=await obterArquivo(c);}catch(e){}if(b){nome=nomeArquivo(c);break;}}
+    if(!b){sem++;st.log("   sem arquivo neste aparelho nem na nuvem");continue;}
+    await espera();
+    try{
+      const j=await iaLer(b,nome,!!cfg.rapido);
+      reTentou=false;
+      if(ehPlanoJ(j)||/ficha/i.test(j.tipo_documento||"")&&Array.isArray(j.auxilio_saude)){lidos++;continue;}
+      const chave=x=>[x.data,x.valor,x.estabelecimento,x.categoria,x.cpf].join("|");
+      const antes=chave(l),obsA=l.obs||"";
+      aplicarIA(j,l);
+      const k=obsA.indexOf("Arquivo original:");
+      if(k>=0&&!(l.obs||"").includes("Arquivo original:")){const fim=obsA.indexOf("\n",k);l.obs=(l.obs?l.obs+"\n":"")+(fim<0?obsA.slice(k):obsA.slice(k,fim));}
+      const p=pessoaPorCpf(l.cpf);if(p)l.pessoaId=p.id;
+      if(chave(l)!==antes){l.conferir=true;mud++;st.log("   ✎ dados alterados → "+textoLanc(l));}
+      l.comprovado=true;l.alteradoEm=agora();lidos++;
+      feitos.add(l.id);feitosSet("reler_feitos",feitos);
+      if(lidos%5===0)await salvarLocal();
+    }catch(e){
+      const m=e.message||"";
+      if(iaParar(m)){parou=m;break;}
+      if(iaMinuto(m)&&!reTentou){st.log("   limite por minuto do Gemini: esperando 1 minuto…");await sleep(61000);reTentou=true;i--;continue;}
+      fal++;st.log("   ⚠ "+m);
+    }
+  }
+  if(!parou)feitosLimpar("reler_feitos");
+  await persistir();render();
+  st.log("\n"+lidos+" de "+lista.length+" nota(s) lida(s) de novo"+(mud?"\n"+mud+" tiveram dados alterados (marcadas \"Conferir\")":"")+(sem?"\n"+sem+" sem arquivo":"")+(fal?"\n"+fal+" não puderam ser lidas":"")
+    +(parou?"\n\nParou antes do fim: "+parou+"\nToque de novo depois para continuar de onde parou.":""));
+  st.acabar();
+}
+
+// ---------------------------------------------------------------- notas da nuvem que não estão lançadas
+function marcarConferido(cam){const s=new Set(JSON.parse(lsGet("procura_ok","[]")||"[]"));s.add(cam);lsSet("procura_ok",JSON.stringify([...s]));}
+async function procurarNaoLancadas(opts={}){
+  if(!cfg.chave){alert("Configure a chave do Gemini primeiro (Leitura das notas por IA).");return;}
+  try{if(!await NV.pronto(true))return;}catch(e){alert(e.message);return;}
+  let todos;
+  try{setStatus("Listando as notas do "+NV.nome+"…");todos=await todasNotasNuvem();setStatus("");}catch(e){setStatus("");alert(e.message);return;}
+  const lig=new Set(D.lancamentos.flatMap(l=>l.nuvem)),ok=new Set(JSON.parse(lsGet("procura_ok","[]")||"[]")),feitos=feitosGet("procura_feitos");
+  const cand=todos.filter(f=>!lig.has(f.cam)&&!ok.has(f.cam)&&!feitos.has(f.cam)&&(opts.tudo||!f.cam.startsWith(cfg.pastaApp+"/Fichas financeiras/")));
+  const avisoEscopo=!NV.podeLerPasta()?"\n\nAtenção: com o acesso atual o app só enxerga as notas que ele mesmo enviou. Para incluir as que você colocou pelo app do Drive, marque \"Ler também a minha pasta de notas do Drive\" em Ajustes → Nuvem.":"";
+  if(!cand.length){alert("Todas as notas do "+NV.nome+" já estão ligadas a um lançamento. Nada a conferir."+avisoEscopo);return;}
+  if(!opts.tudo&&!confirm(cand.length+" arquivo(s) de nota no "+NV.nome+" não estão ligados a nenhum lançamento (inclusive os excluídos ou dados como repetidos antes).\n\n"
+    +"A IA vai ler cada um e comparar com o que já está lançado:\n• já lançada → só conta;\n• comprova um gasto sem nota → liga;\n• não lançada → lança e marca \"Conferir\".\n\n"
+    +"Leva cerca de "+Math.ceil(cand.length/Math.max(2,+cfg.rpm||14))+" minuto(s) e usa a cota do Gemini. Deixe esta página aberta."+avisoEscopo))return;
+  const st=progresso(opts.tudo?"Recomeçando: a IA está lendo todas as notas":"Procurando notas não lançadas"),espera=ritmo(),ign=new Set(D.arquivosIgnorados),org=new Set(),novas=[];
+  let verif=0,ja=0,ligadas=0,fichas=0,fal=0,parou="",reTentou=false;
+  for(let i=0;i<cand.length;i++){
+    if(st.parar){parou="cancelado por você";break;}
+    const f=cand[i];st.log("("+(i+1)+"/"+cand.length+") "+f.nome);
+    await espera();
+    try{
+      const blob=await guardarBaixado(f.cam,await NV.baixar(f.it));
+      const j=await iaLer(blob,f.nome,!!cfg.rapido);verif++;reTentou=false;
+      if(ehPlanoJ(j)){const r=aplicarPlano(j,mensalidadesPlano(j));fichas++;marcarConferido(f.cam);novas.push({extrato:true,texto:"Extrato do plano "+operadoraPlano(j)+": "+r.novos+" lançada(s), "+r.corr+" corrigida(s)"});st.log("   🏥 extrato do plano → "+r.texto);}
+      else if(/ficha/i.test(j.tipo_documento||"")&&Array.isArray(j.auxilio_saude)){const n=aplicarFicha(mesesFicha(j));fichas++;marcarConferido(f.cam);st.log("   📄 ficha financeira → "+n+" mês(es) de auxílio recebido atualizado(s)");}
+      else{
+        const l=novoLanc("GASTO");aplicarIA(j,l);const p=pessoaPorCpf(l.cpf);if(p)l.pessoaId=p.id;
+        const sem=semComprovantePara(l),dups=possiveisDuplicados(l);
+        if(!sem&&dups.length){ja++;marcarConferido(f.cam);st.log("   já lançada ("+textoLanc(dups[0])+")");}
+        else{
+          let cam=f.cam;
+          if(ign.has(cam)){try{const fim=await NV.mover(cam,cfg.pastaApp+"/Comprovantes/Recuperadas/"+f.nome);if(mapa[cam]){mapa[fim]=mapa[cam];delete mapa[cam];}cam=fim;}catch(e){}}
+          if(sem){ligarComprovante(sem,l,cam,"procura no "+NV.nome);ligadas++;org.add(sem.id);st.log("   🔗 comprova o gasto "+textoLanc(sem));}
+          else{l.nuvem=[cam];l.comprovado=true;l.conferir=true;
+            l.obs="Encontrada no "+NV.nome+" pela procura de notas não lançadas"+(l.obs?" — "+l.obs:"");
+            l.alteradoEm=agora();D.lancamentos.push(l);org.add(l.id);novas.push(l);st.log("   ✚ NÃO estava lançada → lançada: "+textoLanc(l));}
+          if((ligadas+novas.length)%5===0)await salvarLocal();
+        }
+      }
+    }catch(e){
+      const m=e.message||"";
+      if(iaParar(m)){parou=m;break;}
+      if(iaMinuto(m)&&!reTentou){st.log("   limite por minuto do Gemini: esperando 1 minuto…");await sleep(61000);reTentou=true;i--;continue;}
+      fal++;st.log("   ⚠ "+m);
+    }
+    feitos.add(f.cam);feitosSet("procura_feitos",feitos);
+  }
+  if(!parou)feitosLimpar("procura_feitos");
+  // no recomeço, cada arquivo ganha um nome novo: assim o caminho antigo (que os outros aparelhos vão ignorar) não se confunde com o novo
+  if((cfg.organizar||opts.tudo)&&org.size){try{await organizar(org,st.log,{forcar:!!opts.tudo});}catch(e){}}
+  await persistir();render();
+  st.log("\n"+verif+" arquivo(s) conferido(s) pela IA."+(ja?"\n• "+ja+" já estavam lançadas":"")+(ligadas?"\n• "+ligadas+" comprovaram gastos que estavam sem nota":"")+(fichas?"\n• "+fichas+" ficha(s) financeira(s) ignoradas":"")
+    +(novas.length?"\n\n"+novas.length+" NOTA(S) QUE NÃO ESTAVAM LANÇADAS (agora lançadas, marcadas \"Conferir\"):\n"+novas.map(l=>" • "+(l.extrato?l.texto:textoLanc(l))).join("\n"):"\n\nNenhuma nota nova encontrada.")
+    +(fal?"\n\n"+fal+" arquivo(s) não puderam ser lidos.":"")+(parou?"\n\nParou antes do fim: "+parou+"\nToque de novo depois para continuar de onde parou.":""));
+  st.acabar();
+}
+
+// ---------------------------------------------------------------- recomeçar do zero
+function recomecarTudo(){
+  if(!NV.conectado()){alert("Conecte o OneDrive primeiro: as notas que a IA vai ler de novo estão lá.");return;}
+  if(!cfg.chave){alert("Configure a chave do Gemini primeiro (Leitura das notas por IA): é ela que vai ler as notas de novo.");return;}
+  const g=D.lancamentos.filter(ehGasto),rec=D.lancamentos.filter(l=>!ehGasto(l)),semArq=g.filter(l=>!l.nuvem.length);
+  dialogo("Recomeçar do zero",`<p style="margin-top:0">Apaga os lançamentos e pede para a IA ler de novo <b>todas as notas</b> que estão na pasta <b>${esc(cfg.pastaApp)}</b> do ${NV.nome} (inclusive fichas financeiras e extratos do plano).</p>
+    <div class="soma"><span>Gastos</span><b>${g.length}</b></div><div class="soma"><span>— sem nota anexada (a IA não consegue recriar)</span><b>${semArq.length}</b></div><div class="soma"><span>Auxílio recebido (meses)</span><b>${rec.length}</b></div>
+    <p class="muted">Antes de apagar, o app baixa uma cópia dos dados neste computador e guarda outra no ${NV.nome} (pasta Backups). Nenhuma nota é apagada da nuvem.</p>
+    <label style="display:block;margin:6px 0"><input type="checkbox" id="rzPes" checked> Manter titular e dependentes</label>
+    <label style="display:block;margin:6px 0"><input type="checkbox" id="rzRec" checked> Manter as despesas recorrentes cadastradas</label>
+    <label style="display:block;margin:6px 0"><input type="checkbox" id="rzAux" checked> Manter o auxílio recebido de cada mês</label>
+    <label style="display:block;margin:6px 0"><input type="checkbox" id="rzSem"> Manter os gastos sem nota anexada (${semArq.length})</label>
+    <label class="campo" style="margin-top:10px">Para confirmar, digite APAGAR<input id="rzConf" autocomplete="off"></label>`,
+    [["Cancelar","out"],["Apagar e ler tudo de novo","perigo",()=>{
+      if(val("rzConf").trim().toUpperCase()!=="APAGAR"){alert("Digite APAGAR para confirmar.");return false;}
+      const o={pes:document.getElementById("rzPes").checked,rec:document.getElementById("rzRec").checked,aux:document.getElementById("rzAux").checked,sem:document.getElementById("rzSem").checked};
+      setTimeout(()=>executarRecomeco(o),60);}]]);
+}
+async function executarRecomeco(o){
+  try{if(!await NV.pronto(true))return;}catch(e){alert(e.message);return;}
+  const dia=new Date().toISOString().slice(0,16).replace("T"," ").replace(":","h");
+  const copia=JSON.stringify(exportarNuvem(D),null,1);
+  try{baixar("auxilio-saude-copia-antes-de-recomecar-"+dia.replace(" ","-")+".json",copia,"application/json");}catch(e){}
+  try{setStatus("Guardando cópia no "+NV.nome+"…");await NV.enviar(cfg.pastaApp+"/Backups/dados antes de recomecar "+dia+".json",new Blob([copia],{type:"application/json"}),"application/json");}
+  catch(e){if(!confirm("Não consegui guardar a cópia no "+NV.nome+" ("+e.message+"). A cópia foi baixada neste computador. Continuar mesmo assim?"))return;}
+  const t=agora(),fica=l=>(!ehGasto(l)&&o.aux)||(ehGasto(l)&&o.sem&&!l.nuvem.length);
+  const sai=D.lancamentos.filter(l=>!fica(l));
+  for(const l of sai)D.excluidos[l.id]=t;          // os outros aparelhos também apagam ao sincronizar
+  D.lancamentos=D.lancamentos.filter(fica);
+  if(!o.pes||!o.rec){if(!o.pes)D.pessoas=vazio().pessoas;if(!o.rec)D.recorrentes=[];D.cadastrosEm=t;}
+  D.arquivosIgnorados=[];mapa={};ui.semAnexo=[];
+  for(const k of ["procura_ok","procura_feitos","procura_feitos_em","reler_feitos","reler_feitos_em"])lsSet(k,null);
+  await salvarLocal();render();
+  try{setStatus("Gravando os dados zerados no "+NV.nome+"…");await NV.enviar(caminhoDados(),new Blob([JSON.stringify(exportarNuvem(D),null,1)],{type:"application/json"}),"application/json");}
+  catch(e){alert("Os dados foram apagados neste aparelho, mas não consegui gravar no "+NV.nome+": "+e.message+"\nToque em Sincronizar depois.");}
+  setStatus(sai.length+" lançamento(s) apagado(s). A IA vai ler as notas de novo…");
+  await procurarNaoLancadas({tudo:true});
+}
+
+// ======================================================================
+// interface (celular)
+// ======================================================================
+const ABAS=[["mes","🧾","Mês"],["historico","📅","Histórico"],["painel","📊","Painel"],["ajustes","⚙️","Ajustes"]];
+const hoje=new Date();
+let ui={aba:"mes",ano:hoje.getFullYear(),mes:hoje.getMonth()+1,anoHist:hoje.getFullYear(),anoPainel:hoje.getFullYear(),busca:"",soConferir:false,precisaLogin:false,semAnexo:[]};
+const $app=()=>document.getElementById("app");
+function abas(){document.getElementById("abas").innerHTML=LIC.liberado&&sessaoAtiva()?ABAS.map(([k,i,t])=>`<button class="${ui.aba===k?"ativo":""}" onclick="irPara('${k}')"><span>${i}</span>${t}</button>`).join(""):"";}
+function irPara(a){ui.aba=a;render();scrollTo(0,0);}
+/** Lista de lançamentos no formato de celular. */
+function tabela(lista,vazioTxt){
+  if(!lista.length)return `<div class="vazio">${vazioTxt}</div>`;
+  return lista.map(l=>`<div class="item" onclick="editar('${l.id}')"><div class="esq">
+    <div class="top">${l.data?dataBr(l.data):"sem data"} · ${esc(ehGasto(l)?l.categoria:"Auxílio recebido")}${ehGasto(l)?" · "+esc(nomePessoa(l.pessoaId)):""}</div>
+    <div class="nome">${esc(l.estabelecimento||l.descricao||"(sem descrição)")}${l.estabelecimento&&l.descricao?` <span class="muted">— ${esc(l.descricao)}</span>`:""}</div>
+    <div>${tags(l)}</div></div>
+    <div class="val ${ehGasto(l)?"":"pos"}">${moeda(l.valor)}</div></div>`).join("");
+}
+function banners(){
+  let h="";
+  if(LICENCA_ATIVA&&!LIC.licenciado)h+=`<div class="banner b1"><span>🔑 ${esc(LIC.texto)}.</span><button class="btn out peq" onclick="pedirLicenca()">Ativar</button></div>`;
+  if(NV.conectado()&&ui.precisaLogin&&!sincronizando)h+=`<div class="banner b0"><span>☁️ Toque para sincronizar com o ${NV.nome}.</span><button class="btn out peq" onclick="sincronizar(true)">Sincronizar</button></div>`;
+  else if(!NV.conectado()&&!lsGet("dica_drive",""))h+=`<div class="banner b0"><span>☁️ Entre com a conta Microsoft (OneDrive) para guardar as notas e ver os mesmos dados no celular e no computador.</span><button class="btn out peq" onclick="irPara('ajustes')">Conectar</button></div>`;
+  const estranhas=D.lancamentos.filter(l=>l.data&&!dataPlausivel(l.data));
+  if(estranhas.length)h+=`<div class="banner b2"><span>📅 ${estranhas.length} lançamento(s) com data que parece errada (ex.: ${dataBr(estranhas[0].data)}, ${moeda(estranhas[0].valor)}). Corrija a data.</span><button class="btn out peq" onclick="editar('${estranhas[0].id}')">Abrir</button></div>`;
+  const pares=paresParecidos();
+  if(pares.length)h+=`<div class="banner b2"><span>🔁 ${pares.length} possível(is) nota(s) lançada(s) duas vezes (mesmo valor). Confira.</span><button class="btn out peq" onclick="verRepetidas()">Ver</button></div>`;
+  const semA=(ui.semAnexo||[]).filter(id=>D.lancamentos.some(l=>l.id===id));
+  if(semA.length)h+=`<div class="banner b2"><span>📎 ${semA.length} gasto(s) marcados como comprovados não têm o arquivo da nota na nuvem.</span><button class="btn out peq" onclick="verSemAnexo()">Ver</button></div>`;
+  const conf=D.lancamentos.filter(l=>l.conferir);
+  if(conf.length)h+=`<div class="banner b1"><span>🔎 ${conf.length} nota(s) lida(s) sozinha(s). Confira os dados.</span><button class="btn out peq" onclick="ui.soConferir=!ui.soConferir;render()">${ui.soConferir?"Voltar":"Ver"}</button></div>`;
+  return h;
+}
+function renderMes(){
+  const lista=doMes(ui.ano,ui.mes),r=resumo(lista);
+  let h=banners();
+  if(ui.soConferir)return h+`<div class="card"><h2>Notas para conferir</h2>${tabela(ordenados().filter(l=>l.conferir),"Nada para conferir.")}
+    <button class="btn out bloco" style="margin-top:10px" onclick="conferirTodas()">Marcar todas como conferidas</button></div>`;
+  h+=cardDisponivel().replace('<div class="disp"','<div class="disp clicavel" onclick="verComposicao()"').replace(/<\/div>$/,'<div style="color:#CFE8E3;font-size:12px;font-weight:700;margin-top:6px">Toque para ver mês a mês de onde vem esse total ›</div></div>');
+  h+=`<div class="acoes"><button class="btn" onclick="document.getElementById('inpFoto').click()">📷 Foto da nota</button>
+    <button class="btn navy" onclick="document.getElementById('inpArqs').click()">📄 Arquivos / várias</button>
+    <button class="btn out" style="grid-column:1/-1" onclick="editar(null)">✍️ Lançar à mão</button></div>`;
+  h+=`<p class="desktop-dica muted" style="display:none;margin:-4px 0 12px">💡 No computador, dá para arrastar as fotos e PDFs das notas para qualquer lugar desta página.</p>`;
+  h+=seletorAno(ui.ano,"mudaAno")+`<div class="meses" id="meses">`;
+  for(let m=1;m<=12;m++){const rr=resumo(doMes(ui.ano,m));const cheio=rr.qtd>0||rr.recebido>0;
+    h+=`<button class="${m===ui.mes?"ativo":cheio?"cheio":""}" onclick="ui.mes=${m};render()">${MESES[m].slice(0,3)}</button>`;}
+  h+=`</div><div class="card"><h2>${MESES[ui.mes]} / ${ui.ano}</h2>
+    <label class="campo">Valor recebido no mês<div class="linha"><input id="inpRec" inputmode="decimal" style="flex:1" value="${r.recebido?num(r.recebido):""}" placeholder="0,00"><button class="btn" onclick="salvarRecebido()">Salvar</button></div></label>
+    <div class="soma"><span>Despesas comprovadas</span><b>${moeda(r.comprovado)}</b></div>
+    <div class="soma"><span>Todas as despesas</span><b>${moeda(r.total)}</b></div>
+    <div class="soma"><span>Saldo (recebido − comprovado)</span><b class="${r.saldo<0?"neg":"pos"}">${moeda(r.saldo)}</b></div>
+    ${r.pendentes?`<p style="color:var(--amber);margin:8px 0 0">${r.pendentes} despesa(s) sem comprovante (${moeda(r.total-r.comprovado)}).</p>`:""}</div>`;
+  h+=`<div class="card"><h2>Lançamentos do mês</h2>${tabela(lista,"Nenhum lançamento neste mês.")}</div>`;
+  const sd=D.lancamentos.filter(l=>!l.data);
+  if(sd.length)h+=`<div class="card"><h2>Sem data (${sd.length})</h2>${tabela(sd,"")}</div>`;
+  setTimeout(()=>{const m=document.getElementById("meses");const b=m&&m.children[ui.mes-1];if(b)m.scrollLeft=b.offsetLeft-60;},0);
+  return h;
+}
+function renderHistorico(){
+  let h=`<div class="eyebrow">Consolidado anual</div><h1>Histórico</h1><p class="desc">Toque num mês para abrir.</p>`+seletorAno(ui.anoHist,"mudaAnoHist");
+  let tot={recebido:0,comprovado:0,total:0};
+  h+=`<div class="card" style="margin-top:10px"><table><thead><tr><th>Mês</th><th class="num">Recebido</th><th class="num">Comprovado</th><th class="num">Saldo</th></tr></thead><tbody>`;
+  for(let m=1;m<=12;m++){const r=resumo(doMes(ui.anoHist,m));for(const k in tot)tot[k]+=r[k];
+    h+=`<tr class="click" onclick="ui.ano=${ui.anoHist};ui.mes=${m};irPara('mes')"><td>${MESES[m].slice(0,3)}${r.pendentes?` <span class="tag t1">${r.pendentes}</span>`:""}</td><td class="num">${moeda(r.recebido)}</td><td class="num">${moeda(r.comprovado)}</td><td class="num ${r.saldo<0?"neg":""}">${moeda(r.saldo)}</td></tr>`;}
+  const s=tot.recebido-tot.comprovado;
+  h+=`<tr><td><b>Total</b></td><td class="num"><b>${moeda(tot.recebido)}</b></td><td class="num"><b>${moeda(tot.comprovado)}</b></td><td class="num ${s<0?"neg":""}"><b>${moeda(s)}</b></td></tr></tbody></table></div>`;
+  h+=`<div class="card"><h2>Buscar</h2><input id="busca" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px" placeholder="Farmácia, CPF, nº da nota, valor…" value="${esc(ui.busca)}" oninput="ui.busca=this.value;ui.semData=false;atualizarBusca()"><div id="resBusca" style="margin-top:10px"></div></div>`;
+  setTimeout(atualizarBusca,0);return h;
+}
+function renderAjustes(){
+  const ult=+lsGet("ultima_sinc","0");
+  let h=`<div class="eyebrow">Configuração</div><h1>Ajustes</h1>`+cardConta();
+  if(LICENCA_ATIVA)h+=`<div class="card"><h2>🔑 Licença</h2><p class="muted" style="margin-top:0">${esc(LIC.texto||"")}</p><button class="btn out" onclick="pedirLicenca()">Informar código de licença</button></div>`;
+  if(LICENCA_ATIVA&&!LIC.licenciado)h+=cardVenda();
+  h+=`<div class="card"><h2>☁️ OneDrive</h2>
+   <p class="muted" style="margin-top:0">Guarda as notas na pasta <b>${esc(cfg.pastaApp)}</b> do seu OneDrive e mantém os mesmos dados no celular e no computador. Entre com a mesma conta Microsoft em todos.</p>
+   ${NV.conectado()?`<p>✅ ${NV.nome} conectado${lsGet("ms_conta","")?": "+esc(lsGet("ms_conta","")):""}${ult?" · última sincronização "+new Date(ult).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):""}</p>
+     <div class="linha"><button class="btn" onclick="sincronizar(true,true)">🔄 Sincronizar agora</button><button class="btn perigo" onclick="if(confirm('Desconectar deste aparelho? Os dados continuam aqui e na nuvem.'))desconectarNuvem()">Desconectar</button></div>
+     <label style="display:block;margin-top:10px"><input type="checkbox" ${cfg.autoSinc?"checked":""} onchange="cfg.autoSinc=this.checked;salvarCfg()"> Sincronizar sozinho depois de cada alteração</label>
+     <div class="linha" style="margin-top:12px"><button class="btn" onclick="procurarNaoLancadas()">🔎 Procurar notas não lançadas</button><button class="btn out" onclick="recuperarSumidos()">🕘 Recuperar lançamentos que sumiram</button></div>`
+   :`<button class="btn" onclick="conectarNuvem()">Conectar ${NV.nome}</button>`}
+   ${!MS_CLIENT_ID_WEB?`<label class="campo" style="margin-top:12px">ID do aplicativo da Microsoft<input value="${esc(cfg.msClientId)}" placeholder="00000000-0000-0000-0000-000000000000" onchange="cfg.msClientId=this.value.trim();salvarCfg()"></label>`:""}
+   </div>`;
+  if(NV.podeLerPasta())h+=`<div class="card"><h2>📂 Pasta das notas</h2>
+   <p class="muted" style="margin-top:0">As notas que você colocar nesta pasta do ${NV.nome} (as que já estão lá também) são lidas sozinhas e viram lançamentos com a etiqueta "Conferir".</p>
+   <label class="campo">Pasta<div class="linha"><input id="cfNotas" style="flex:1" value="${esc(cfg.pastaNotas)}" placeholder="${esc(cfg.pastaApp)}" onchange="cfg.pastaNotas=this.value.trim();salvarCfg()">${NV.conectado()?`<button class="btn out" onclick="escolherPasta('')">Escolher…</button>`:""}</div></label>
+   <label style="display:block;margin-bottom:8px"><input type="checkbox" ${cfg.lerAuto?"checked":""} onchange="cfg.lerAuto=this.checked;salvarCfg()"> Ler as notas novas ao sincronizar (a cada 15 minutos)</label>
+   <label style="display:block;margin-bottom:8px"><input type="checkbox" ${cfg.organizar?"checked":""} onchange="cfg.organizar=this.checked;salvarCfg()"> Organizar as notas lidas: mover e renomear para ${esc(cfg.pastaApp)}/Comprovantes/ano/mês</label>
+   ${NV.conectado()?`<div class="linha"><button class="btn" onclick="lerAgora()">📂 Ler notas novas agora</button><button class="btn out" onclick="organizarAgora()">Organizar as notas já lidas</button><button class="btn out" onclick="recuperarExcluidas()">♻️ Recuperar notas excluídas</button></div><div class="muted" id="logPasta" style="white-space:pre-wrap;font-size:13px;margin-top:8px;max-height:220px;overflow:auto"></div>`:""}</div>`;
+  h+=`<div class="card"><h2>🤖 Leitura das notas por IA</h2>
+   <p class="muted" style="margin-top:0">Google Gemini, com cota gratuita. Crie a chave em aistudio.google.com/apikey com sua conta Google. A chave fica só neste aparelho.</p>
+   <label class="campo">Chave do Gemini<input id="cfChave" type="password" autocomplete="off" value="${esc(cfg.chave)}" placeholder="AIza…"></label>
+   <label class="campo">Modelo<input id="cfModelo" value="${esc(cfg.modelo)}"></label>
+   <label style="display:block;margin-bottom:8px"><input type="checkbox" id="cfRapido" ${cfg.rapido?"checked":""}> Usar o Flash-Lite para várias notas (mais rápido)</label>
+   <label class="campo">Notas por minuto<input id="cfRpm" type="number" min="2" value="${esc(cfg.rpm)}"></label>
+   <div class="linha"><button class="btn" onclick="salvarIa()">Salvar</button><button class="btn out" onclick="testarIa()">Testar IA</button><button class="btn out" onclick="salvarIa();reanalisarNotas()">🔁 Reanalisar notas com IA</button></div></div>`;
+  h+=`<div class="card"><h2>👥 Titular e dependentes</h2>`+D.pessoas.map(p=>`<div class="item" onclick="editarPessoa('${p.id}')"><div class="esq"><div class="nome">${esc(p.nome)}</div><div class="top">${esc(p.tipo)}${p.cpf?" · "+esc(p.cpf):""}</div></div><div class="val">›</div></div>`).join("")+
+    `<button class="btn out" style="margin-top:8px" onclick="editarPessoa(null)">+ Dependente</button></div>`;
+  h+=`<div class="card"><h2>🔁 Despesas mensais recorrentes</h2><p class="muted" style="margin-top:0">Plano de saúde, psicóloga… O lançamento de cada mês aparece sozinho.</p>`+
+    (D.recorrentes.length?D.recorrentes.map(r=>`<div class="item" onclick="editarRecorrente('${r.id}')"><div class="esq"><div class="nome">${esc(r.descricao||r.categoria)}</div><div class="top">${esc(nomePessoa(r.pessoaId))} · desde ${esc(r.inicio)}${r.fim?" até "+esc(r.fim):""}</div></div><div class="val">${moeda(r.valor)}</div></div>`).join(""):`<div class="vazio">Nenhuma cadastrada.</div>`)+
+    `<button class="btn out" style="margin-top:8px" onclick="editarRecorrente(null)">+ Recorrente</button></div>`;
+  h+=`<div class="card"><h2>💾 Cópias e planilha</h2><div class="linha">
+    <button class="btn out" onclick="baixarCsv()">📊 Planilha (CSV)</button>
+    <button class="btn out" onclick="baixar('dados_auxilio_saude_copia.json',JSON.stringify(exportarNuvem(D),null,1),'application/json')">💾 Cópia dos dados</button>
+    <button class="btn out" onclick="document.getElementById('inpJson').click()">⬆ Importar cópia (JSON)</button></div></div>`;
+  h+=`<div class="card"><h2>⚠️ Recomeçar do zero</h2><p class="muted" style="margin-top:0">Apaga os lançamentos e a IA lê de novo todas as notas da nuvem. Faz cópia antes; nenhuma nota é apagada da nuvem.</p>
+    <button class="btn perigo" onclick="recomecarTudo()">Apagar tudo e ler as notas de novo</button></div>`;
+  h+=`<div class="card"><h2>📱 Instalar na tela de início</h2><ol class="passos" style="padding-left:18px;margin:0">
+    <li><b>iPhone:</b> abra este endereço no <b>Safari</b>, toque em <b>Compartilhar</b> (quadrado com seta) → <b>Adicionar à Tela de Início</b>.</li>
+    <li><b>Android:</b> no Chrome, menu ⋮ → <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>
+    <li><b>Computador:</b> no Edge ou no Chrome, clique no ícone de instalar na barra de endereço (ou menu → <b>Aplicativos → Instalar</b>). Ele abre como um programa, com ícone na área de trabalho.</li></ol>${instalador?`<button class="btn navy" style="margin-top:10px" onclick="instalarAtalho()">📲 Instalar agora</button>`:""}</div>`;
+  return h;
+}
+function renderBloqueio(){
+  return `<div class="card" style="margin-top:20px"><div class="eyebrow">Licença</div><h1>Ative o Auxílio-Saúde</h1>
+   <p>${esc(LIC.texto)}. Informe o código de licença que você recebeu na compra. Seus lançamentos continuam guardados e voltam assim que a licença for ativada.</p>
+   ${CONTATO?`<p>Para comprar: ${esc(CONTATO)}</p>`:""}
+   <button class="btn bloco" onclick="pedirLicenca()">🔑 Informar código de licença</button></div>`+cardVenda();
+}
+/** Seção de disponibilização e venda: preço, formas de pagamento e como receber o código. */
+function cardVenda(){
+  const v=VENDA,zap=v.whatsapp.replace(/\D/g,"");
+  const msg=encodeURIComponent("Olá! Quero comprar a licença do Auxílio-Saúde. Segue o comprovante de pagamento. Nome completo: ");
+  let h=`<div class="card"><div class="eyebrow">Disponibilização e venda</div><h2 style="margin-top:4px">🛒 Comprar a licença</h2>`;
+  if(v.preco)h+=`<div class="soma"><span>Valor${v.modalidade?" · "+esc(v.modalidade):""}</span><b>${esc(v.preco)}</b></div>`;
+  h+=`<ol class="passos" style="padding-left:18px;margin:10px 0">
+    <li>Faça o pagamento${v.pix?" por Pix":""}${v.linkPagamento?(v.pix?" ou pelo link de pagamento":" pelo link de pagamento"):""}.</li>
+    <li>Envie o comprovante com seu <b>nome completo</b> e <b>e-mail</b>${zap?" pelo WhatsApp":""}${zap&&v.email?" ou":""}${v.email?" para "+esc(v.email):""}.</li>
+    <li>Você recebe um código que começa com <b>AS1-</b>. Toque em <b>Informar código de licença</b> e cole o código. Os lançamentos já feitos continuam guardados.</li></ol>`;
+  if(v.pix)h+=`<label class="campo">Chave Pix${v.favorecido?" · "+esc(v.favorecido):""}<div class="linha"><input id="vendaPix" readonly style="flex:1" value="${esc(v.pix)}"><button class="btn out" onclick="copiarPix()">Copiar</button></div></label>`;
+  const bt=[];
+  if(v.linkPagamento)bt.push(`<a class="btn" href="${esc(v.linkPagamento)}" target="_blank" rel="noopener">💳 Pagar pelo link</a>`);
+  if(zap)bt.push(`<a class="btn navy" href="https://wa.me/${zap}?text=${msg}" target="_blank" rel="noopener">💬 Enviar comprovante</a>`);
+  if(v.email)bt.push(`<a class="btn out" href="mailto:${esc(v.email)}?subject=${encodeURIComponent("Licença Auxílio-Saúde")}&body=${msg}">✉️ E-mail</a>`);
+  if(bt.length)h+=`<div class="linha" style="margin-top:6px">${bt.join("")}</div>`;
+  if(!v.pix&&!v.linkPagamento&&!zap&&!v.email&&!CONTATO)h+=`<p class="muted">As formas de pagamento ainda não foram informadas pelo distribuidor.</p>`;
+  if(v.pagina)h+=`<p class="muted" style="margin:10px 0 0;font-size:13px"><a href="${esc(v.pagina)}" target="_blank" rel="noopener">Condições de venda, reembolso e privacidade</a></p>`;
+  return h+`</div>`;
+}
+function copiarPix(){
+  const el=document.getElementById("vendaPix");if(!el)return;
+  const ok=()=>alert("Chave Pix copiada.");
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(ok).catch(()=>{el.select();document.execCommand("copy");ok();});
+  else{el.select();document.execCommand("copy");ok();}
+}
+function pedirLicenca(){
+  dialogo("Código de licença",`<label class="campo">Cole o código recebido<textarea id="licCod" rows="4" placeholder="AS1-…"></textarea></label>`,
+    [["Cancelar","out"],["Ativar","",async()=>{
+      try{await ativarLicenca(val("licCod"));alert(LIC.texto+". Obrigado!");render();}
+      catch(e){alert(e.message);return false;}}]]);
+  if(navigator.clipboard&&navigator.clipboard.readText)navigator.clipboard.readText().then(t=>{if(t&&t.trim().startsWith("AS1-"))document.getElementById("licCod").value=t.trim();}).catch(()=>{});
+}
+async function conectarNuvem(){
+  try{await NV.pronto(true);lsSet("sessao",cfg.nuvem);lsSet("dica_drive","1");await sincronizar(true,true);}catch(e){alert(e.message);}
+  render();
+}
+async function lerAgora(){
+  const el=document.getElementById("logPasta");let txt="";
+  const log=t=>{txt+=t+"\n";const e=document.getElementById("logPasta");if(e){e.textContent=txt;e.scrollTop=e.scrollHeight;}setStatus("📂 "+esc(t.slice(0,90)));};
+  try{if(!await NV.pronto(true))return;await lerPasta(log);await sincronizar(false);}catch(e){log("⚠ "+e.message);}
+  const e=document.getElementById("logPasta");if(e)e.textContent=txt;
+}
+async function organizarAgora(){
+  if(!confirm("As notas que o app leu da sua pasta serão movidas e renomeadas no "+NV.nome+" para "+cfg.pastaApp+"/Comprovantes/ano/mês. Nada é apagado. Continuar?"))return;
+  let txt="";const log=t=>{txt+=t+"\n";const e=document.getElementById("logPasta");if(e){e.textContent=txt;e.scrollTop=e.scrollHeight;}setStatus("📂 "+esc(t.slice(0,90)));};
+  try{if(!await NV.pronto(true))return;const n=await organizar(null,log);log(n+" arquivo(s) organizado(s).");await sincronizar(false);}catch(e){log("⚠ "+e.message);}
+}
+/** Notas cujo lançamento foi excluído mas o arquivo continua na nuvem (o app não apaga da nuvem ao excluir). */
+async function recuperarExcluidas(){
+  let txt="";const log=t=>{txt+=t+"\n";const e=document.getElementById("logPasta");if(e){e.textContent=txt;e.scrollTop=e.scrollHeight;}setStatus("♻️ "+esc(t.slice(0,90)));};
+  try{
+    if(!await NV.pronto(true))return;log("Procurando notas excluídas no "+NV.nome+"…");
+    let todos=await listarNotas(cfg.pastaApp,0,[]);const pn=pastaNotas();
+    if(pn!==cfg.pastaApp&&!pn.startsWith(cfg.pastaApp+"/")){try{todos=todos.concat(await listarNotas(pn,0,[]));}catch(e){}}
+    const ign=new Set(D.arquivosIgnorados),ativos=new Set(D.lancamentos.flatMap(l=>l.nuvem)),vis=new Set();
+    const lista=todos.filter(f=>ign.has(f.cam)&&!ativos.has(f.cam)&&!f.cam.startsWith(cfg.pastaApp+"/Fichas financeiras/")&&!vis.has(f.cam)&&vis.add(f.cam));
+    if(!lista.length){log("Nenhuma nota excluída encontrada. Se você também apagou o arquivo no "+NV.nome+", restaure da Lixeira de lá e toque em Ler notas novas.");return;}
+    window.__rec=lista;
+    const corpo=lista.map((f,i)=>`<label class="item" style="gap:10px;align-items:flex-start"><input type="checkbox" id="rec${i}" ${f.cam.includes("/sem data/")?"checked":""}><div class="esq"><div class="nome">${esc(f.nome)}</div><div class="muted" style="font-size:12px">${esc(f.cam.split("/").slice(0,-1).join("/"))}</div></div></label>`).join("");
+    dialogo("Notas excluídas que ainda estão no "+NV.nome,corpo,[["Cancelar","out"],["Recuperar e ler de novo","",async()=>{document.getElementById("dlg").close();
+      const esc2=window.__rec.filter((f,i)=>document.getElementById("rec"+i)&&document.getElementById("rec"+i).checked);let n=0;
+      for(const f of esc2){try{log("Recuperando "+f.nome);await NV.mover(f.cam,cfg.pastaApp+"/Comprovantes/Recuperadas/"+f.nome);n++;}catch(e){log("⚠ "+e.message);}}
+      log(n+" nota(s) recuperada(s). Lendo de novo…");await lerPasta(log);await sincronizar(false);
+      log("As recuperadas sem data ficam com \"Conferir\": abra cada uma e preencha a data em vez de excluir.");}]]);
+  }catch(e){log("⚠ "+e.message);}
+}
+async function escolherPasta(cam){
+  let itens;
+  try{setStatus("Abrindo "+esc(cam||NV.nome)+"…");if(!await NV.pronto(true))return;itens=await NV.listar(cam);setStatus("");}catch(e){alert(e.message);return;}
+  const pastas=itens.filter(i=>i.pasta).map(i=>i.nome).sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  const notas=itens.filter(i=>i.arquivo&&ehComprovante(i.nome)).length;
+  const sobe=cam?cam.split("/").slice(0,-1).join("/"):null;
+  window.__pastas=pastas;window.__cam=cam;window.__sobe=sobe;
+  const corpo=(cam!==""?`<div class="item" onclick="document.getElementById('dlg').close();escolherPasta(window.__sobe)"><div class="esq"><div class="nome">⬆ Voltar</div></div></div>`:"")
+    +(pastas.length?pastas.map((p,i)=>`<div class="item" onclick="document.getElementById('dlg').close();escolherPasta((window.__cam?window.__cam+'/':'')+window.__pastas[${i}])"><div class="esq"><div class="nome">📁 ${esc(p)}</div></div><div class="val">›</div></div>`).join(""):`<div class="vazio">Sem subpastas.</div>`);
+  dialogo(cam||NV.nome,corpo,[["Cancelar","out"],...(cam?[["Usar esta pasta ("+notas+" nota"+(notas===1?"":"s")+")","",()=>{cfg.pastaNotas=cam;salvarCfg();render();}]]:[])]);
+}
+
+/** Gasto já lançado sem comprovante que esta nota provavelmente comprova. */
+function semComprovantePara(l){
+  if(!ehGasto(l)||!(l.valor>0))return null;let melhor=null,md=1e9;
+  for(const o of D.lancamentos){
+    if(o.id===l.id||!ehGasto(o)||(o.nuvem&&o.nuvem.length)||Math.abs(o.valor-l.valor)>=.005)continue;
+    let ok;
+    if(o.recorrenteId)ok=!!l.data&&(l.data||"").slice(0,7)===(o.data||"").slice(0,7)&&o.categoria===l.categoria;
+    else{const a=norm(l.estabelecimento),b=norm(o.estabelecimento);
+      ok=(!a||!b||a===b||a.includes(b)||b.includes(a))&&(!l.data||!o.data||Math.abs(diasIso(l.data)-diasIso(o.data))<=45);}
+    if(!ok)continue;const dd=l.data&&o.data?Math.abs(diasIso(l.data)-diasIso(o.data)):99;if(dd<md){md=dd;melhor=o;}
+  }
+  return melhor;
+}
+function ligarComprovante(alvo,l,cam,origem){
+  alvo.nuvem.push(cam);alvo.comprovado=true;alvo.conferir=true;
+  if(!alvo.estabelecimento)alvo.estabelecimento=l.estabelecimento;if(!alvo.data)alvo.data=l.data;if(!alvo.cpf)alvo.cpf=l.cpf;if(!alvo.pessoaId)alvo.pessoaId=l.pessoaId;
+  alvo.obs="Comprovante ligado automaticamente ("+origem+") — confira"+(alvo.obs?" — "+alvo.obs:"");alvo.alteradoEm=agora();
+}
+// ---------------------------------------------------------------- ficha financeira -> auxílio recebido mês a mês
+function mesesFicha(j){
+  return (j.auxilio_saude||[]).map(o=>{const n=v=>typeof v==="number"?v:parseValor(v);return {ano:+(o.ano||j.ano),mes:+o.mes,valor:n(o.valor)||0,dif:n(o.diferenca)||0};})
+    .filter(m=>m.ano>=2000&&m.mes>=1&&m.mes<=12&&m.valor+m.dif>0).map(m=>({...m,total:Math.round((m.valor+m.dif)*100)/100,k:anoMes(m.ano,m.mes)}));
+}
+function aplicarFicha(ms){
+  let n=0;
+  for(const m of ms){
+    let alvo=D.lancamentos.find(l=>l.id==="rec-"+m.k);
+    for(const l of [...D.lancamentos]){if(ehGasto(l)||(l.data||"").slice(0,7)!==m.k||l===alvo)continue;if(!alvo){alvo=l;continue;}
+      D.lancamentos=D.lancamentos.filter(x=>x!==l);D.excluidos[l.id]=agora();}
+    if(!alvo){alvo=novoLanc("RECEBIMENTO");alvo.id="rec-"+m.k;alvo.data=m.k+"-01";alvo.categoria="Outro";D.lancamentos.push(alvo);}
+    if(Math.abs(alvo.valor-m.total)<.005&&String(alvo.descricao).startsWith("Auxílio saúde (ficha"))continue;
+    alvo.valor=m.total;alvo.descricao="Auxílio saúde (ficha financeira)";alvo.obs="Ficha financeira: auxílio "+moeda(m.valor)+(m.dif>0?" + diferença "+moeda(m.dif):"");alvo.alteradoEm=agora();n++;
+  }
+  return n;
+}
+// ---------------------------------------------------------------- extrato de pagamentos do plano de saúde -> gasto de cada mês
+const ehPlanoJ=j=>j&&Array.isArray(j.mensalidades)&&!Array.isArray(j.auxilio_saude);
+function compPlano(s){s=String(s||"").trim();let m=s.match(/(\d{4})-(\d{1,2})/);if(m)return m[1]+"-"+m[2].padStart(2,"0");m=s.match(/(?:\d{1,2}\/)?(\d{1,2})\/(\d{4})/);return m?m[2]+"-"+m[1].padStart(2,"0"):"";}
+function mensalidadesPlano(j){
+  const n=v=>typeof v==="number"?Math.round(v*100)/100:parseValor(v);const vis=new Set();
+  return (j.mensalidades||[]).map(o=>{let c=compPlano(o.competencia);const pg=dataIso(o.pagamento||"");let v=n(o.valor_pago)||n(o.valor)||0;if(!c&&pg)c=pg.slice(0,7);
+      return {comp:c,pg,valor:v,benef:String(o.beneficiario||"").trim(),data:dataPlausivel(pg)?pg:c+"-01"};})
+    .filter(m=>m.comp&&m.valor>0&&!vis.has(m.comp+"|"+m.pg+"|"+m.valor)&&vis.add(m.comp+"|"+m.pg+"|"+m.valor)).sort((a,b)=>a.comp.localeCompare(b.comp));
+}
+const operadoraPlano=j=>String(j.operadora||"").trim()||String(j.administradora||"").trim()||"Plano de saúde";
+const ehGastoPlano=l=>ehGasto(l)&&normalizarCategoria(l.categoria)==="Plano de saúde";
+function aplicarPlano(j,ms){
+  const r={novos:0,corr:0,iguais:0,semData:0};const cpf=soDig(j.cpf_titular),p=pessoaPorCpf(cpf),pid=p?p.id:"";
+  const op=operadoraPlano(j),adm=String(j.administradora||"").trim(),chave=cpf||pid||norm(String(j.titular||"")+op);const usados=new Set();
+  r.pessoa=p?p.nome.replace(" (titular)",""):String(j.titular||"").trim();
+  for(const m of ms){
+    const id="pl-"+chave+"-"+m.comp;let alvo=D.lancamentos.find(l=>l.id===id);
+    if(!alvo){const mesPg=m.data.slice(0,7);let melhor=null;
+      for(const l of D.lancamentos){
+        if(!ehGastoPlano(l)||usados.has(l.id)||l.id.startsWith("pl-"))continue;const am=(l.data||"").slice(0,7);if(am!==mesPg&&am!==m.comp)continue;
+        const mesma=pid?l.pessoaId===pid:!!cpf&&soDig(l.cpf)===cpf;
+        const e=norm(l.estabelecimento);const semP=!l.pessoaId&&!soDig(l.cpf)&&(!e||e.includes(norm(op))||(adm&&e.includes(norm(adm))));
+        if(!mesma&&!semP)continue;
+        if(!melhor||Math.abs(l.valor-m.valor)<Math.abs(melhor.valor-m.valor)||(am===mesPg&&(melhor.data||"").slice(0,7)!==mesPg))melhor=l;}
+      alvo=melhor;}
+    const novo=!alvo;if(novo){alvo=novoLanc("GASTO");alvo.id=id;D.lancamentos.push(alvo);}
+    usados.add(alvo.id);
+    if(!novo&&Math.abs(alvo.valor-m.valor)<.005&&alvo.data===m.data&&alvo.comprovado){r.iguais++;continue;}
+    const cc=m.comp.slice(5,7)+"/"+m.comp.slice(0,4);
+    alvo.categoria="Plano de saúde";if(novo||!alvo.estabelecimento)alvo.estabelecimento=op;alvo.descricao="Mensalidade do plano — competência "+cc;
+    alvo.data=m.data;alvo.valor=m.valor;if(pid)alvo.pessoaId=pid;if(cpf)alvo.cpf=cpf;if(!alvo.consumidor)alvo.consumidor=m.benef||String(j.titular||"");
+    alvo.comprovado=true;alvo.obs="Extrato do plano"+(adm?" ("+adm+")":"")+": competência "+cc+(dataPlausivel(m.pg)?", pago em "+dataBr(m.pg):"");alvo.alteradoEm=agora();
+    novo?r.novos++:r.corr++;
+  }
+  r.semData=D.lancamentos.filter(l=>ehGastoPlano(l)&&!l.data&&(pid?l.pessoaId===pid:(!cpf||soDig(l.cpf)===cpf||!l.pessoaId))).length;
+  r.texto=r.novos+" mensalidade(s) lançada(s), "+r.corr+" corrigida(s)"+(r.iguais?", "+r.iguais+" já estavam certas":"")+"."
+    +(r.semData?"\n\nAtenção: há "+r.semData+" gasto(s) de plano de saúde SEM DATA"+(r.pessoa?" de "+r.pessoa:"")+". Se eram o total do plano lançado de uma vez, exclua-os para não contar em dobro.":"");
+  return r;
+}
+function perguntarPlano(j){
+  const ms=mensalidadesPlano(j);if(!ms.length){alert("Não encontrei mensalidades pagas neste extrato.");return;}
+  const p=pessoaPorCpf(j.cpf_titular),anos={};for(const m of ms){const a=m.comp.slice(0,4);anos[a]=anos[a]||{n:0,v:0};anos[a].n++;anos[a].v+=m.valor;}
+  const t=ms.reduce((a,m)=>a+m.valor,0);window.__plano=[j,ms];
+  dialogo("Extrato do plano: lançar as mensalidades?",`<p style="margin-top:0"><b>${esc(operadoraPlano(j))}</b>${j.administradora?" ("+esc(j.administradora)+")":""}<br>Titular: ${p?esc(p.nome):esc(j.titular||"não identificado")+(p?"":" <span class=\"muted\">— não cadastrado</span>")}</p>`
+    +Object.keys(anos).sort().map(a=>`<div class="soma"><span>${a}: ${anos[a].n} mensalidade(s)</span><b>${moeda(anos[a].v)}</b></div>`).join("")+`<div class="soma"><b>Total</b><b>${moeda(t)}</b></div>`
+    +`<p class="muted">Cada mensalidade entra como gasto "Plano de saúde" na data do pagamento. Se já houver o lançamento do plano daquele mês (da mesma pessoa), ele é corrigido com o valor do extrato, sem duplicar.</p>`,
+    [["Cancelar","out"],["Lançar "+ms.length+" mensalidade(s)","",async()=>{const r=aplicarPlano(...window.__plano);await persistir();render();setTimeout(()=>alert(r.texto),100);}]]);
+}
+const resumoFicha=ms=>ms.map(m=>`<div class="soma"><span>${MESES[m.mes].slice(0,3)}/${m.ano}${m.dif>0?` <span class="muted">(inclui diferença de ${moeda(m.dif)})</span>`:""}</span><b>${moeda(m.total)}</b></div>`).join("");
+function perguntarFicha(ms){
+  if(!ms.length){alert("Não encontrei a linha de Auxílio-Saúde nesta ficha.");return;}
+  const t=ms.reduce((a,m)=>a+m.total,0);window.__ficha=ms;
+  dialogo("Ficha financeira: lançar o auxílio recebido?",resumoFicha(ms)+`<div class="soma"><b>Total</b><b>${moeda(t)}</b></div><p class="muted">O valor de cada mês substitui o que estiver lançado como recebido naquele mês. Confira com a ficha.</p>`,
+    [["Cancelar","out"],["Lançar "+ms.length+" mês(es)","",async()=>{const n=aplicarFicha(window.__ficha);await persistir();render();setStatus(n+" mês(es) de auxílio recebido atualizado(s) pela ficha.");}]]);
+}
+function verComposicao(){
+  const m={};
+  for(const l of D.lancamentos){const k=(l.data||"").slice(0,7)||"~";m[k]=m[k]||[0,0,0];if(ehGasto(l)){m[k][1]+=l.valor;m[k][2]++;}else m[k][0]+=l.valor;}
+  const ks=Object.keys(m).sort();let tr=0,tg=0;
+  const linhas=ks.map(k=>{const v=m[k];tr+=v[0];tg+=v[1];const nome=k==="~"?"Sem data":MESES[+k.slice(5,7)].slice(0,3)+"/"+k.slice(0,4);
+    return `<div class="item" onclick="document.getElementById('dlg').close();${k==="~"?"ui.semData=true;ui.busca='';irPara('historico')":`ui.ano=${+k.slice(0,4)};ui.mes=${+k.slice(5,7)};irPara('mes')`}"><div class="esq"><div class="nome">${nome}</div><div class="top">${v[2]} gasto(s)</div></div><div class="val"><span class="pos">${moeda(v[0])}</span><br>${moeda(v[1])}</div></div>`;}).join("");
+  dialogo("Total: "+moeda(tr)+" − "+moeda(tg),`<p class="muted" style="margin-top:0">Recebido (verde) e gasto de cada mês. Toque num mês para abrir.</p>`+linhas,[["Fechar","out"]]);
+}
+// ---------------------------------------------------------------- possíveis notas repetidas
+function diasIso(d){return Math.round(new Date(d+"T12:00:00").getTime()/86400000);}
+/** Mesmo valor, datas a até 45 dias (ou sem data) e estabelecimento igual ou não informado: só avisa. */
+function parecidas(l){
+  if(!ehGasto(l)||!(l.valor>0)||l.recorrenteId)return [];
+  const fortes=possiveisDuplicados(l);
+  return D.lancamentos.filter(o=>o.id!==l.id&&ehGasto(o)&&!o.recorrenteId&&!fortes.includes(o)&&Math.abs(o.valor-l.valor)<.005
+    &&(!norm(l.estabelecimento)||!norm(o.estabelecimento)||norm(l.estabelecimento)===norm(o.estabelecimento))
+    &&(!l.data||!o.data||Math.abs(diasIso(l.data)-diasIso(o.data))<=45));
+}
+const chavePar=(a,b)=>"par|"+(a.id<b.id?a.id+b.id:b.id+a.id);
+function paresParecidos(){
+  const r=[],vistos=new Set();
+  for(const l of D.lancamentos)for(const o of [...possiveisDuplicados(l),...parecidas(l)]){
+    const k=chavePar(l,o);if(vistos.has(k)||D.recorrentesIgnorados.includes(k))continue;vistos.add(k);r.push([l,o]);}
+  return r;
+}
+const descL=l=>(l.data?dataBr(l.data):"sem data")+" · "+esc(l.categoria)+" · "+moeda(l.valor)+(l.estabelecimento?" · "+esc(l.estabelecimento):l.descricao?" · "+esc(l.descricao):"");
+function verRepetidas(){
+  const pares=paresParecidos();window.__pares=pares;
+  dialogo("Possíveis repetidas",pares.map((p,i)=>`<div class="card" style="padding:10px"><div>1) ${descL(p[0])}</div><div>2) ${descL(p[1])}</div>
+    <div class="linha" style="margin-top:8px"><button type="button" class="btn out peq" onclick="document.getElementById('dlg').close();editar(window.__pares[${i}][0].id)">Abrir a 1</button>
+    <button type="button" class="btn out peq" onclick="document.getElementById('dlg').close();editar(window.__pares[${i}][1].id)">Abrir a 2</button>
+    <button type="button" class="btn peq" onclick="naoRepetidas(${i})">Não são repetidas</button></div></div>`).join("")+`<p class="muted">Se for a mesma nota, abra uma delas e toque em Excluir.</p>`,[["Fechar","out"]]);
+}
+function naoRepetidas(i){const [a,b]=window.__pares[i];D.recorrentesIgnorados.push(chavePar(a,b));document.getElementById("dlg").close();persistir();render();}
+
+// ---------------------------------------------------------------- arquivos das notas
+async function abrirArquivo(cam){
+  let b=null;
+  try{setStatus("Abrindo…");b=await obterArquivo(cam);setStatus("");}catch(e){alert(e.message);return;}
+  if(!b){alert("Arquivo não encontrado neste aparelho nem no Drive.");return;}
+  const u=URL.createObjectURL(b);
+  const pdf=/pdf/.test(b.type)||/\.pdf$/i.test(cam);
+  const corpo=pdf?`<p>PDF pronto.</p><a class="btn bloco" href="${u}" target="_blank" rel="noopener">Abrir o PDF</a>`:`<div class="visor"><img src="${u}" alt="Comprovante"></div>`;
+  const d=document.getElementById("dlg");const reabrir=d.open&&editando;
+  if(d.open)d.close();
+  dialogo(nomeArquivo(cam),corpo,[["Fechar","out",()=>{setTimeout(()=>URL.revokeObjectURL(u),60000);if(reabrir)setTimeout(()=>desenharEditor(!D.lancamentos.some(x=>x.id===editando.id)),50);}]]);
+}
+async function lerEditorIa(i,novo){
+  lerEditor();let b;
+  try{b=await obterArquivo(editando.nuvem[i]);}catch(e){alert(e.message);return;}
+  if(!b){alert("Arquivo não encontrado.");return;}
+  setStatus("🤖 Lendo com IA…");
+  try{const j=await iaLer(b,nomeArquivo(editando.nuvem[i]));if(ehPlanoJ(j)){setStatus("");document.getElementById("dlg").close();perguntarPlano(j);return;}if(/ficha/i.test(j.tipo_documento||"")&&Array.isArray(j.auxilio_saude)){setStatus("");document.getElementById("dlg").close();perguntarFicha(mesesFicha(j));return;}
+    aplicarIA(j,editando);const p=pessoaPorCpf(editando.cpf);if(p)editando.pessoaId=p.id;editando.comprovado=true;desenharEditor(novo);setStatus("🤖 Lido. Confira e salve.");}
+  catch(e){alert(e.message);setStatus("");}
+}
+async function anexarNoEditor(f,novo){
+  if(!f)return;lerEditor();
+  try{const r=await reduzir(f);const k=await guardarArquivo(r.blob,r.nome);editando.nuvem.push(k);editando.comprovado=true;desenharEditor(novo);}catch(e){alert(e.message);}
+}
+/** Foto ou vários arquivos: cada um vira um lançamento (lido pela IA em paralelo). */
+async function adicionarArquivos(arqs){
+  arqs=[...arqs].filter(f=>f&&(ehComprovante(f.name||"")||/^image\//.test(f.type)||/pdf/.test(f.type)));
+  if(!arqs.length)return;
+  const ia=!!cfg.chave,um=arqs.length===1;
+  const intervalo=ia?60000/Math.max(2,+cfg.rpm||14):0;let proximo=0,parou=false;
+  const lerUma=async(f,k)=>{
+    const r=await reduzir(f);const chave=await guardarArquivo(r.blob,r.nome);
+    let l=novoLanc("GASTO"),como="";
+    if(ia&&!parou){const a=Date.now(),vez=Math.max(a,proximo);proximo=vez+intervalo;if(vez>a)await sleep(vez-a);}
+    try{como=await lerNota(r.blob,r.nome,l,ia&&!parou,!um&&!!cfg.rapido);}
+    catch(e){if(!parou){parou=true;if(um)alert("A IA não leu a nota: "+e.message+"\nPreencha à mão.");}l=novoLanc("GASTO");como=await lerNota(r.blob,r.nome,l,false);}
+    l.nuvem=[chave];return {l,como};
+  };
+  let ativos=0;const espera=[];
+  const limitar=fn=>new Promise((ok,err)=>{const go=()=>{ativos++;fn().then(ok,err).finally(()=>{ativos--;const n=espera.shift();if(n)n();});};ativos<4?go():espera.push(go);});
+  const ps=arqs.map((f,k)=>limitar(()=>lerUma(f,k)));
+  let lidas=0,rep=0,lig=0,fichas=0,planos=0;
+  for(let k=0;k<ps.length;k++){
+    setStatus((ia?"🤖 Lendo":"📎 Guardando")+" nota "+(k+1)+" de "+ps.length+"…");
+    let res;try{res=await ps[k];}catch(e){alert("Não consegui abrir um arquivo: "+e.message);continue;}
+    const {l,como}=res;
+    if(l._plano){await DB.del("arq",l.nuvem[0]);if(um){perguntarPlano(l._plano);return;}const r=aplicarPlano(l._plano,mensalidadesPlano(l._plano));planos+=r.novos+r.corr;continue;}
+    if(l._ficha){await DB.del("arq",l.nuvem[0]);if(um){perguntarFicha(mesesFicha(l._ficha));return;}fichas+=aplicarFicha(mesesFicha(l._ficha));continue;}
+    if(!l.data)l.data=anoMes(ui.ano,ui.mes)+"-01";
+    l.comprovado=true;
+    if(como)l.obs=(l.obs?l.obs+" — ":"")+"Lido "+(como==="IA"?"pela IA":"pelo "+como);
+    if(um){editando=l;editando.conferir=false;desenharEditor(true);setStatus(ia?"Confira os dados lidos e salve.":"Preencha os dados e salve.");return;}
+    const dups=possiveisDuplicados(l);
+    if(dups.length&&dups[0].nuvem.length){rep++;await DB.del("arq",l.nuvem[0]);continue;}
+    if(!dups.length){const alvo=semComprovantePara(l);if(alvo){ligarComprovante(alvo,l,l.nuvem[0],"importado");lig++;continue;}}
+    if(dups.length){dups[0].nuvem.push(l.nuvem[0]);dups[0].comprovado=true;dups[0].alteradoEm=agora();continue;}
+    const par=parecidas(l);if(par.length)l.obs="⚠ Pode ser repetida de "+(par[0].data?dataBr(par[0].data):"um lançamento sem data")+" ("+moeda(par[0].valor)+")"+(l.obs?" — "+l.obs:"");
+    l.conferir=true;l.alteradoEm=agora();D.lancamentos.push(l);lidas++;
+    if(lidas%5===0)render();
+  }
+  await persistir();render();
+  setStatus(lidas+" nota(s) lançada(s)"+(fichas?", "+fichas+" mês(es) de auxílio pela ficha financeira":"")+(planos?", "+planos+" mensalidade(s) do plano pelo extrato":"")+(lig?", "+lig+" ligada(s) a gastos sem comprovante":"")+(rep?", "+rep+" repetida(s) ignorada(s)":"")+". Confira as marcadas com \"Conferir\".");
+}
+async function importarJson(f){
+  if(!f)return;
+  try{const r=parseDados(await f.text());const t=agora();for(const l of r.lancamentos)l.alteradoEm=t;if(r.pessoas.length||r.recorrentes.length)r.cadastrosEm=t;
+    mesclar(D,r);aplicarRecorrentes(D);await persistir();render();alert("Cópia importada: "+r.lancamentos.length+" lançamento(s).");}
+  catch(e){alert("Não consegui ler o arquivo: "+e.message);}
+}
+
+// ---------------------------------------------------------------- início
+function render(){
+  abas();
+  if(!sessaoAtiva()){$app().innerHTML=renderLogin();return;}
+  if(!LIC.liberado){$app().innerHTML=renderBloqueio();return;}
+  const r={mes:renderMes,historico:renderHistorico,painel:renderPainel,ajustes:renderAjustes}[ui.aba];
+  $app().innerHTML=r();
+}
+document.getElementById("inpFoto").onchange=e=>{const f=[...e.target.files];e.target.value="";adicionarArquivos(f);};
+document.getElementById("inpArqs").onchange=e=>{const f=[...e.target.files];e.target.value="";adicionarArquivos(f);};
+document.getElementById("inpJson").onchange=e=>{const f=e.target.files[0];e.target.value="";importarJson(f);};
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&sessaoAtiva()&&NV.conectado()&&cfg.autoSinc)sincronizar(false);});
+// computador: arrastar as notas para qualquer lugar da página
+document.addEventListener("dragover",e=>{e.preventDefault();document.body.classList.add("arrastando");});
+document.addEventListener("dragleave",e=>{if(!e.relatedTarget)document.body.classList.remove("arrastando");});
+document.addEventListener("drop",e=>{e.preventDefault();document.body.classList.remove("arrastando");if(LIC.liberado&&sessaoAtiva()&&e.dataTransfer&&e.dataTransfer.files.length)adicionarArquivos([...e.dataTransfer.files]);});
+/** Volta do login da Microsoft: entrega o código para a janela do app e fecha. */
+const qsLogin=new URLSearchParams(location.search);
+const voltaMs=qsLogin.has("code")&&qsLogin.has("state")||qsLogin.has("error")&&qsLogin.has("state");
+if(voltaMs&&window.opener&&window.opener!==window){
+  try{window.opener.postMessage({tipo:"ms-codigo",code:qsLogin.get("code"),state:qsLogin.get("state"),erro:qsLogin.get("error_description")},location.origin);}catch(e){}
+  document.body.innerHTML='<p style="font:16px sans-serif;padding:30px;text-align:center">✅ Pronto! Pode fechar esta janela.</p>';
+  setTimeout(()=>window.close(),300);
+}else(async()=>{
+  if(voltaMs){history.replaceState(null,"",redirMs());
+    if(qsLogin.get("code"))try{await msConcluir(qsLogin.get("code"),qsLogin.get("state"));cfg.nuvem="onedrive";salvarCfg();if(lsGet("sessao_pendente","")){lsSet("sessao_pendente",null);lsSet("sessao","onedrive");lsSet("dica_drive","1");}}catch(e){setTimeout(()=>alert(e.message),300);}
+    else setTimeout(()=>alert("Microsoft: "+(qsLogin.get("error_description")||qsLogin.get("error"))),300);}
+  const txt=await DB.get("kv","dados");
+  try{D=txt?parseDados(txt):vazio();}catch(e){D=vazio();}
+  mapa=(await DB.get("kv","mapa"))||{};
+  await atualizarLicenca();
+  if(aplicarRecorrentes(D))salvarLocal();
+  render();
+  if(LIC.liberado&&sessaoAtiva()&&NV.conectado()&&cfg.autoSinc){
+    sincronizar(false);}
+  if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+})();
+</script>
+</body>
+</html>
