@@ -175,21 +175,13 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 /** Registro do app na Microsoft (Entra), com a plataforma "Aplicativo de página única" apontando para o endereço do app. */
 /** ID do aplicativo registrado no Microsoft Entra: preencha em config.js (ver README.md). */
 const MS_CLIENT_ID_WEB=String((window.AUX_CONFIG||{}).msClientId||"").trim();
-/** Venda: pede código de licença depois de alguns dias de teste. */
-const LICENCA_ATIVA=false;
-const DIAS_TESTE=7;
-const CONTATO="";
-/** Disponibilização e venda: dados mostrados ao usuário para comprar a licença (deixe "" para esconder o item). */
-const VENDA={
-  preco:"",          // ex.: "R$ 29,90"
-  modalidade:"",     // ex.: "licença anual" ou "licença vitalícia (pagamento único)"
-  pix:"",            // chave Pix (e-mail, telefone, CPF/CNPJ ou aleatória)
-  favorecido:"",     // nome que aparece no Pix
-  linkPagamento:"",  // link de checkout (Mercado Pago, PagSeguro, Hotmart…)
-  whatsapp:"",       // só números com DDI e DDD, ex.: "5585999999999"
-  email:"",          // e-mail para envio do comprovante e suporte
-  pagina:"privacidade.html#termos" // página com condições de uso
-};
+/** Código de acesso e contador de uso: configurados em config.js (ver README.md). */
+const AC=window.AUX_CONFIG||{};
+const LICENCA_ATIVA=AC.exigirCodigo===true;          // pede o código de acesso para usar o app
+const DIAS_TESTE=Math.max(0,Math.floor(+AC.diasTeste||0)); // dias de uso livre antes de pedir o código (0 = pede logo)
+const VINCULAR_EMAIL=AC.vincularEmail!==false;       // o código só vale para a conta Microsoft com o mesmo e-mail
+const PEDIDO={texto:String(AC.contato||"").trim(),whatsapp:String(AC.whatsapp||"").replace(/\D/g,""),email:String(AC.emailContato||"").trim()};
+const GOATCOUNTER=String(AC.goatcounter||"").trim().replace(/^https?:\/\//,"").replace(/\.goatcounter\.com.*$/,"");
 const CHAVE_PUBLICA="MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmztOMpZv0CVoXNEX5rD8ut/jphbl2kTJVyHYHShTOw7EvmAIwq4J5D44MTKVokwyuVUIn42I56D+StPFxI7qWA==";
 
 /** Prefixo próprio: no mesmo endereço do GitHub Pages, não mistura dados com outros apps publicados lá. */
@@ -395,7 +387,7 @@ async function msConcluir(code,state){
 }
 let msEspera=null;
 async function msEntrar(){
-  if(!clientIdMs())throw new Error("O login da Microsoft ainda não foi configurado neste app (Ajustes).");
+  if(!clientIdMs())throw new Error("O login da Microsoft ainda não foi configurado: falta o ID do aplicativo no arquivo config.js.");
   const v=b64url(crypto.getRandomValues(new Uint8Array(48)));
   const ch=b64url(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v)));
   const st=b64url(crypto.getRandomValues(new Uint8Array(12)));
@@ -580,11 +572,28 @@ async function sincronizar(interativo,lerNotas){
 }
 function desconectarNuvem(){NV.sair();lsSet("sessao","local");render();}
 
+// ---------------------------------------------------------------- contador anônimo de uso (GoatCounter: sem cookies, sem nome nem e-mail)
+const filaContador=[];
+function contar(caminho,titulo,evento){
+  if(!GOATCOUNTER)return;
+  const f=()=>{try{window.goatcounter.count({path:caminho,title:titulo||caminho,event:!!evento});}catch(e){}};
+  if(window.goatcounter&&window.goatcounter.count)f();else filaContador.push(f);
+}
+function iniciarContador(){
+  if(!GOATCOUNTER||location.protocol==="file:")return;
+  window.goatcounter={no_onload:true};
+  const s=document.createElement("script");s.async=true;s.src="https://gc.zgo.at/count.js";
+  s.dataset.goatcounter="https://"+GOATCOUNTER+".goatcounter.com/count";
+  s.onload=()=>{for(const f of filaContador.splice(0))f();};
+  document.head.appendChild(s);
+  contar(instaladoComoApp()?"/atalho":"/navegador",instaladoComoApp()?"Aberto pelo atalho instalado":"Aberto no navegador");
+}
+
 // ---------------------------------------------------------------- sessão: login com a conta Microsoft (OneDrive)
 // Não há servidor: a conta da nuvem é a identidade. Cada pessoa entra com a própria conta e os dados ficam na nuvem dela.
 let instalador=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();instalador=e;if(typeof render==="function")render();});
-addEventListener("appinstalled",()=>{instalador=null;render();});
+addEventListener("appinstalled",()=>{instalador=null;contar("instalou","Instalou o atalho",true);render();});
 const instaladoComoApp=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;}catch(e){return false;}};
 const ehIos=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 function sessaoAtiva(){
@@ -599,7 +608,7 @@ function contaAtual(){
   return {tipo:"onedrive",nome:lsGet("ms_nome","")||"Conta Microsoft",email:lsGet("ms_conta","")};
 }
 async function entrar(tipo){
-  if(tipo==="local"){lsSet("sessao","local");lsSet("dica_drive","1");render();return;}
+  if(tipo==="local"){if(LICENCA_ATIVA)return;lsSet("sessao","local");lsSet("dica_drive","1");render();return;}
   if(cfg.nuvem!==tipo){cfg.nuvem=tipo;salvarCfg();lsSet("ult_leitura",null);}
   lsSet("sessao_pendente",tipo);   // Microsoft sem janela: o login volta recarregando a página
   try{await NV.pronto(true);}catch(e){lsSet("sessao_pendente",null);alert(e.message);render();return;}
@@ -607,8 +616,10 @@ async function entrar(tipo){
 }
 async function concluirEntrada(){
   lsSet("sessao_pendente",null);lsSet("sessao",cfg.nuvem);lsSet("dica_drive","1");
+  contar("entrou","Entrou com a conta Microsoft",true);
+  await atualizarLicenca();
   ui.aba="mes";render();
-  await sincronizar(true,true);
+  if(LIC.liberado)await sincronizar(true,true);
 }
 function sair(){
   const c=contaAtual(),local=c.tipo==="local";
@@ -622,14 +633,16 @@ function sair(){
         const t0=Date.now();await sincronizar(true);
         if(+lsGet("ultima_sinc","0")<t0){alert("Não foi possível sincronizar com o "+NV.nome+". Para não perder lançamentos, confira a internet e tente sair de novo.");return false;}
       }
-      await limparAparelho();render();scrollTo(0,0);
+      contar("saiu","Saiu",true);
+      await limparAparelho();await atualizarLicenca();render();scrollTo(0,0);
     }]]);
 }
 /** Apaga deste aparelho os dados da pessoa que saiu (a nuvem dela não é tocada). */
 async function limparAparelho(){
   try{NV.sair();}catch(e){}
   for(const k of ["sessao","sessao_pendente","ultima_sinc","ult_leitura","procura_ok","dica_drive","aux_cfg"])lsSet(k,null);
-  await DB.del("kv","dados");await DB.del("kv","mapa");
+  lsSet("licenca",null);
+  await DB.del("kv","dados");await DB.del("kv","mapa");await DB.del("kv","licenca");
   try{const db=await DB.abrir();await new Promise(ok=>{const t=db.transaction("arq","readwrite");t.objectStore("arq").clear();t.oncomplete=ok;t.onerror=ok;});}catch(e){}
   cfg={...CFG_PADRAO};D=vazio();mapa={};
   ui={...ui,aba:"mes",busca:"",soConferir:false,precisaLogin:false,semAnexo:[]};setStatus("");
@@ -653,7 +666,7 @@ function renderLogin(){
     ${clientIdMs()?"":`<div class="banner b1" style="margin-top:10px;text-align:left"><span>O login da Microsoft ainda não foi configurado. Cole abaixo o ID do aplicativo registrado no portal Entra.</span></div>
       <label class="campo" style="text-align:left">ID do aplicativo da Microsoft<input value="${esc(cfg.msClientId)}" placeholder="00000000-0000-0000-0000-000000000000" onchange="cfg.msClientId=this.value.trim();salvarCfg();render()"></label>`}
     <p class="muted" style="font-size:13px;margin:12px 0 0">Use uma conta Microsoft pessoal (Outlook, Hotmail, Live) ou de trabalho. Seus dados ficam no <b>seu</b> OneDrive, numa pasta chamada "${esc(cfg.pastaApp)}". O app não tem servidor e não vê seus dados. Assim, você usa no celular e no computador com as mesmas informações.</p>
-    <button class="linkbtn" onclick="entrar('local')">Usar sem conta (só neste aparelho)</button>
+    ${LICENCA_ATIVA?"":`<button class="linkbtn" onclick="entrar('local')">Usar sem conta (só neste aparelho)</button>`}
    </div>
    ${instaladoComoApp()?"":`<div class="card"><h2>📲 Ter o app na tela inicial</h2><p class="muted" style="margin-top:0">Não precisa de loja de aplicativos: o atalho abre o Auxílio-Saúde como um app, em tela cheia.</p>${botaoInstalar()}</div>`}
    <p class="muted" style="font-size:12px;text-align:center">Ao entrar, você concorda com os <a href="privacidade.html#termos" target="_blank" rel="noopener">Termos de Serviço</a> e a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</p>
@@ -756,17 +769,24 @@ async function atualizarLicenca(){
   if(!LICENCA_ATIVA){LIC={liberado:true,licenciado:true,texto:""};return LIC;}
   const cod=lsGet("licenca","")||(await DB.get("kv","licenca"))||"";
   let motivo="";
-  if(cod){try{const d=await verificarLicenca(cod);
-    LIC={liberado:true,licenciado:true,texto:"Licenciado para "+d.nome+(d.validade.length===8&&d.validade!=="00000000"?" · válida até "+d.validade.slice(6)+"/"+d.validade.slice(4,6)+"/"+d.validade.slice(0,4):"")};return LIC;}
+  if(cod){try{const d=await verificarLicenca(cod);conferirEmail(d);
+    LIC={liberado:true,licenciado:true,texto:"Acesso liberado para "+d.nome+(d.validade.length===8&&d.validade!=="00000000"?" · válido até "+d.validade.slice(6)+"/"+d.validade.slice(4,6)+"/"+d.validade.slice(0,4):"")};return LIC;}
     catch(e){motivo=e.message;}}
   let ini=+lsGet("teste_inicio","0")||+(await DB.get("kv","teste_inicio"))||0;
   if(!ini){ini=Date.now();lsSet("teste_inicio",String(ini));await DB.set("kv","teste_inicio",ini).catch(()=>{});}
   const dias=Math.max(0,DIAS_TESTE-Math.floor((Date.now()-ini)/86400000));
-  LIC={liberado:dias>0,licenciado:false,dias,texto:motivo||(dias>0?"Teste grátis: "+dias+(dias===1?" dia restante":" dias restantes"):"O período de teste terminou")};
+  LIC={liberado:dias>0,licenciado:false,dias,texto:motivo||(dias>0?"Uso livre: "+dias+(dias===1?" dia restante":" dias restantes")+" para informar o código de acesso":DIAS_TESTE?"O período de uso livre terminou":"Para usar o app, informe o seu código de acesso")};
   return LIC;
 }
+/** O código traz o e-mail para quem foi gerado: só vale na conta Microsoft com esse e-mail. */
+function conferirEmail(d){
+  if(!VINCULAR_EMAIL||!d.email)return;
+  const conta=(lsGet("ms_conta","")||"").trim().toLowerCase();
+  if(!conta)throw new Error("Entre com a sua conta Microsoft para usar este código");
+  if(conta!==d.email.trim().toLowerCase())throw new Error("Este código foi gerado para "+d.email+", mas você entrou com "+conta+". Entre com a conta certa ou peça um código para este e-mail");
+}
 async function ativarLicenca(cod){
-  await verificarLicenca(cod);
+  const d=await verificarLicenca(cod);conferirEmail(d);
   const c=String(cod).replace(/\s+/g,"");lsSet("licenca",c);await DB.set("kv","licenca",c);
   await atualizarLicenca();
 }
@@ -1428,8 +1448,7 @@ function renderHistorico(){
 function renderAjustes(){
   const ult=+lsGet("ultima_sinc","0");
   let h=`<div class="eyebrow">Configuração</div><h1>Ajustes</h1>`+cardConta();
-  if(LICENCA_ATIVA)h+=`<div class="card"><h2>🔑 Licença</h2><p class="muted" style="margin-top:0">${esc(LIC.texto||"")}</p><button class="btn out" onclick="pedirLicenca()">Informar código de licença</button></div>`;
-  if(LICENCA_ATIVA&&!LIC.licenciado)h+=cardVenda();
+  if(LICENCA_ATIVA)h+=`<div class="card"><h2>🔑 Código de acesso</h2><p class="muted" style="margin-top:0">${esc(LIC.texto||"")}</p><button class="btn out" onclick="pedirLicenca()">Informar código de acesso</button></div>`;
   h+=`<div class="card"><h2>☁️ OneDrive</h2>
    <p class="muted" style="margin-top:0">Guarda as notas na pasta <b>${esc(cfg.pastaApp)}</b> do seu OneDrive e mantém os mesmos dados no celular e no computador. Entre com a mesma conta Microsoft em todos.</p>
    ${NV.conectado()?`<p>✅ ${NV.nome} conectado${lsGet("ms_conta","")?": "+esc(lsGet("ms_conta","")):""}${ult?" · última sincronização "+new Date(ult).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):""}</p>
@@ -1470,42 +1489,23 @@ function renderAjustes(){
   return h;
 }
 function renderBloqueio(){
-  return `<div class="card" style="margin-top:20px"><div class="eyebrow">Licença</div><h1>Ative o Auxílio-Saúde</h1>
-   <p>${esc(LIC.texto)}. Informe o código de licença que você recebeu na compra. Seus lançamentos continuam guardados e voltam assim que a licença for ativada.</p>
-   ${CONTATO?`<p>Para comprar: ${esc(CONTATO)}</p>`:""}
-   <button class="btn bloco" onclick="pedirLicenca()">🔑 Informar código de licença</button></div>`+cardVenda();
-}
-/** Seção de disponibilização e venda: preço, formas de pagamento e como receber o código. */
-function cardVenda(){
-  const v=VENDA,zap=v.whatsapp.replace(/\D/g,"");
-  const msg=encodeURIComponent("Olá! Quero comprar a licença do Auxílio-Saúde. Segue o comprovante de pagamento. Nome completo: ");
-  let h=`<div class="card"><div class="eyebrow">Disponibilização e venda</div><h2 style="margin-top:4px">🛒 Comprar a licença</h2>`;
-  if(v.preco)h+=`<div class="soma"><span>Valor${v.modalidade?" · "+esc(v.modalidade):""}</span><b>${esc(v.preco)}</b></div>`;
-  h+=`<ol class="passos" style="padding-left:18px;margin:10px 0">
-    <li>Faça o pagamento${v.pix?" por Pix":""}${v.linkPagamento?(v.pix?" ou pelo link de pagamento":" pelo link de pagamento"):""}.</li>
-    <li>Envie o comprovante com seu <b>nome completo</b> e <b>e-mail</b>${zap?" pelo WhatsApp":""}${zap&&v.email?" ou":""}${v.email?" para "+esc(v.email):""}.</li>
-    <li>Você recebe um código que começa com <b>AS1-</b>. Toque em <b>Informar código de licença</b> e cole o código. Os lançamentos já feitos continuam guardados.</li></ol>`;
-  if(v.pix)h+=`<label class="campo">Chave Pix${v.favorecido?" · "+esc(v.favorecido):""}<div class="linha"><input id="vendaPix" readonly style="flex:1" value="${esc(v.pix)}"><button class="btn out" onclick="copiarPix()">Copiar</button></div></label>`;
+  const c=contaAtual(),zap=PEDIDO.whatsapp;
+  const msg=encodeURIComponent("Olá! Quero um código de acesso do Auxílio-Saúde.\nNome: "+(c.tipo!=="local"?c.nome:"")+"\nE-mail da conta Microsoft: "+(c.tipo!=="local"?c.email:""));
   const bt=[];
-  if(v.linkPagamento)bt.push(`<a class="btn" href="${esc(v.linkPagamento)}" target="_blank" rel="noopener">💳 Pagar pelo link</a>`);
-  if(zap)bt.push(`<a class="btn navy" href="https://wa.me/${zap}?text=${msg}" target="_blank" rel="noopener">💬 Enviar comprovante</a>`);
-  if(v.email)bt.push(`<a class="btn out" href="mailto:${esc(v.email)}?subject=${encodeURIComponent("Licença Auxílio-Saúde")}&body=${msg}">✉️ E-mail</a>`);
-  if(bt.length)h+=`<div class="linha" style="margin-top:6px">${bt.join("")}</div>`;
-  if(!v.pix&&!v.linkPagamento&&!zap&&!v.email&&!CONTATO)h+=`<p class="muted">As formas de pagamento ainda não foram informadas pelo distribuidor.</p>`;
-  if(v.pagina)h+=`<p class="muted" style="margin:10px 0 0;font-size:13px"><a href="${esc(v.pagina)}" target="_blank" rel="noopener">Condições de venda, reembolso e privacidade</a></p>`;
-  return h+`</div>`;
-}
-function copiarPix(){
-  const el=document.getElementById("vendaPix");if(!el)return;
-  const ok=()=>alert("Chave Pix copiada.");
-  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(ok).catch(()=>{el.select();document.execCommand("copy");ok();});
-  else{el.select();document.execCommand("copy");ok();}
+  if(zap)bt.push(`<a class="btn navy" href="https://wa.me/${zap}?text=${msg}" target="_blank" rel="noopener">💬 Pedir pelo WhatsApp</a>`);
+  if(PEDIDO.email)bt.push(`<a class="btn out" href="mailto:${esc(PEDIDO.email)}?subject=${encodeURIComponent("Código de acesso — Auxílio-Saúde")}&body=${msg}">✉️ Pedir por e-mail</a>`);
+  return `<div class="card" style="margin-top:20px"><div class="eyebrow">Acesso</div><h1>Código de acesso</h1>
+   <p>${esc(LIC.texto)}.</p>
+   <p class="muted">O Auxílio-Saúde é gratuito, mas o uso é liberado por um código individual${VINCULAR_EMAIL&&c.tipo!=="local"&&c.email?`, gerado para o e-mail <b>${esc(c.email)}</b>`:""}. Seus lançamentos ficam guardados no OneDrive e aparecem assim que o código for informado.</p>
+   <button class="btn bloco" onclick="pedirLicenca()">🔑 Informar código de acesso</button></div>
+   ${bt.length||PEDIDO.texto?`<div class="card"><h2>Ainda não tem o código?</h2>${PEDIDO.texto?`<p class="muted" style="margin-top:0">${esc(PEDIDO.texto)}</p>`:""}${bt.length?`<div class="linha">${bt.join("")}</div>`:""}</div>`:""}
+   <p style="text-align:center"><button class="linkbtn" onclick="sair()">Entrar com outra conta</button></p>`;
 }
 function pedirLicenca(){
-  dialogo("Código de licença",`<label class="campo">Cole o código recebido<textarea id="licCod" rows="4" placeholder="AS1-…"></textarea></label>`,
+  dialogo("Código de acesso",`<label class="campo">Cole o código recebido<textarea id="licCod" rows="4" placeholder="AS1-…"></textarea></label>`,
     [["Cancelar","out"],["Ativar","",async()=>{
-      try{await ativarLicenca(val("licCod"));alert(LIC.texto+". Obrigado!");render();}
-      catch(e){alert(e.message);return false;}}]]);
+      try{await ativarLicenca(val("licCod"));contar("codigo-ativado","Código ativado",true);alert(LIC.texto+".");render();if(NV.conectado())sincronizar(false);}
+      catch(e){contar("codigo-recusado","Código recusado",true);alert(e.message+".");return false;}}]]);
   if(navigator.clipboard&&navigator.clipboard.readText)navigator.clipboard.readText().then(t=>{if(t&&t.trim().startsWith("AS1-"))document.getElementById("licCod").value=t.trim();}).catch(()=>{});
 }
 async function conectarNuvem(){
@@ -1775,11 +1775,12 @@ if(voltaMs&&window.opener&&window.opener!==window){
   setTimeout(()=>window.close(),300);
 }else(async()=>{
   if(voltaMs){history.replaceState(null,"",redirMs());
-    if(qsLogin.get("code"))try{await msConcluir(qsLogin.get("code"),qsLogin.get("state"));cfg.nuvem="onedrive";salvarCfg();if(lsGet("sessao_pendente","")){lsSet("sessao_pendente",null);lsSet("sessao","onedrive");lsSet("dica_drive","1");}}catch(e){setTimeout(()=>alert(e.message),300);}
+    if(qsLogin.get("code"))try{await msConcluir(qsLogin.get("code"),qsLogin.get("state"));cfg.nuvem="onedrive";salvarCfg();if(lsGet("sessao_pendente","")){lsSet("sessao_pendente",null);lsSet("sessao","onedrive");lsSet("dica_drive","1");contar("entrou","Entrou com a conta Microsoft",true);}}catch(e){setTimeout(()=>alert(e.message),300);}
     else setTimeout(()=>alert("Microsoft: "+(qsLogin.get("error_description")||qsLogin.get("error"))),300);}
   const txt=await DB.get("kv","dados");
   try{D=txt?parseDados(txt):vazio();}catch(e){D=vazio();}
   mapa=(await DB.get("kv","mapa"))||{};
+  iniciarContador();
   await atualizarLicenca();
   if(aplicarRecorrentes(D))salvarLocal();
   render();

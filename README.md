@@ -5,11 +5,11 @@ App web gratuito para controlar os gastos com o auxílio-saúde. Cada pessoa ent
 | Arquivo | Para que serve |
 |---|---|
 | `index.html` | O app inteiro (telas, login Microsoft, OneDrive, leitura por IA) |
-| `config.js` | **Único arquivo que você precisa editar:** o ID do app registrado na Microsoft |
+| `config.js` | **Único arquivo que você precisa editar:** ID do app na Microsoft, código de acesso e contador de uso |
 | `privacidade.html` | Política de Privacidade e Termos de Uso (a Microsoft pede esses links) |
 | `manifest.webmanifest`, `sw.js`, ícones | Permitem instalar o atalho e abrir sem internet |
 
-A publicação tem três partes, nesta ordem: **(1)** publicar no GitHub Pages para ganhar um endereço, **(2)** registrar esse endereço na Microsoft, **(3)** colar o ID do registro no `config.js`.
+A publicação tem três partes, nesta ordem: **(1)** publicar no GitHub Pages para ganhar um endereço, **(2)** registrar esse endereço na Microsoft, **(3)** colar o ID do registro no `config.js`. As partes 4 e 5 tratam do controle de quem usa.
 
 ---
 
@@ -110,6 +110,58 @@ Pronto. É só divulgar o endereço.
 
 ---
 
+## Parte 4: Código de acesso (quem pode usar)
+
+O app é gratuito, mas só funciona com um **código individual** gerado por você. O código traz o nome e o e-mail da pessoa e é assinado com a sua chave secreta. O app confere a assinatura e exige que o e-mail do código seja o mesmo da conta Microsoft que entrou. Assim, um código repassado para outra pessoa não funciona.
+
+**Liga e desliga no `config.js`:**
+
+```js
+exigirCodigo: true,     // false = qualquer pessoa usa, sem código
+diasTeste: 0,           // ex.: 7 = a pessoa usa 7 dias antes de precisar do código
+vincularEmail: true,    // o código só vale na conta Microsoft com o mesmo e-mail
+contato: "Peça o seu código de acesso ao responsável pelo app.",
+whatsapp: "5585999999999",      // aparece o botão "Pedir pelo WhatsApp" (opcional)
+emailContato: "seu@email.com",  // aparece o botão "Pedir por e-mail" (opcional)
+```
+
+**Para liberar uma pessoa:**
+
+1. A pessoa entra no app com a conta Microsoft dela. A tela "Código de acesso" mostra o e-mail exato da conta, e o botão de WhatsApp ou e-mail já manda nome e e-mail para você.
+2. Abra no seu computador o arquivo **`gerador-de-codigos-PRIVADO.html`**, preencha nome e **esse mesmo e-mail** e clique em **Gerar código**.
+3. Clique em **Copiar com instruções** e mande para a pessoa. Ela cola o código no app, e pronto.
+
+**Sua lista de usuários** fica na tabela "Códigos gerados" do gerador. Ela fica guardada **só no navegador onde você abriu o gerador**, então use **Baixar lista (CSV)** de vez em quando como cópia.
+
+**Para cortar o acesso de alguém:** gere os códigos com data em **Válido até** (por exemplo, 1 ano) e não renove. Um código sem data de vencimento não pode ser cancelado depois, porque o app confere tudo no próprio aparelho, sem servidor.
+
+> ⚠️ **O gerador nunca vai para o GitHub.** Ele contém a chave secreta: quem tiver esse arquivo cria códigos à vontade. Guarde-o fora da pasta do site, com uma cópia de segurança, por exemplo num pen drive ou no seu OneDrive pessoal.
+
+---
+
+## Parte 5: Contador de uso (GoatCounter, gratuito)
+
+Mostra quantas pessoas abrem o app, sem coletar nome nem e-mail e sem cookies.
+
+1. Acesse **goatcounter.com** e clique em **Sign up**. É gratuito para uso não comercial.
+2. Em **Code**, escolha um nome, por exemplo `auxiliosaude`. Seu painel será `https://auxiliosaude.goatcounter.com`.
+3. Preencha e-mail e senha e confirme o cadastro pelo e-mail.
+4. No `config.js`, preencha `goatcounter: "auxiliosaude"` e faça **Commit changes**.
+
+No painel aparecem:
+
+| Item | O que significa |
+|---|---|
+| `/navegador` | Aberturas do app pelo navegador |
+| `/atalho` | Aberturas pelo atalho instalado na tela inicial |
+| `entrou` / `saiu` | Logins e saídas de conta |
+| `codigo-ativado` / `codigo-recusado` | Códigos de acesso aceitos e recusados (recusa costuma ser e-mail diferente) |
+| `instalou` | Atalhos instalados (só Android e computador; o iPhone não avisa) |
+
+O GoatCounter conta visitantes únicos por dia de forma aproximada. Para saber **quem** usa, a referência é a lista do gerador de códigos.
+
+---
+
 ## Quando der erro no login
 
 | Mensagem | Causa e solução |
@@ -125,7 +177,7 @@ Pronto. É só divulgar o endereço.
 
 ## Publicar uma atualização
 
-1. Edite ou substitua o arquivo no GitHub e faça **Commit changes**.
+1. Edite ou substitua o arquivo no GitHub e faça **Commit changes**. **Não substitua o `config.js`** por um novo, porque isso apaga o seu ID e as suas configurações. Edite só as linhas que mudaram.
 2. Se mudou o `index.html`, abra o `sw.js` e aumente o número da versão (por exemplo, `auxilio-onedrive-v1` → `auxilio-onedrive-v2`). Assim os atalhos já instalados baixam a versão nova.
 
 ## Opcional: verificação de editor (contas de trabalho)
