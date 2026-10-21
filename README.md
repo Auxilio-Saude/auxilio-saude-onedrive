@@ -108,6 +108,8 @@ Clique em **Salvar**.
 
 Pronto. É só divulgar o endereço.
 
+No primeiro uso em cada aparelho, o app abre sozinho um **guia de configuração**: cria a pasta no OneDrive, cadastra titular e dependentes, ajuda a criar e testar a chave da IA, define a pasta das notas e instala o atalho. Para rever o guia, use **Ajustes → Guia de configuração**.
+
 ---
 
 ## Parte 4: Código de acesso (quem pode usar)

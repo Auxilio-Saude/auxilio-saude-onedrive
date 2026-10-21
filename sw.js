@@ -1,6 +1,6 @@
 // Auxílio-Saúde (OneDrive): guarda o app para abrir sem internet. Sempre tenta a versão nova primeiro.
 // Ao publicar uma mudança, aumente o número da VERSAO para os aparelhos trocarem o cache.
-const VERSAO = "auxilio-onedrive-v2";
+const VERSAO = "auxilio-onedrive-v3";
 const ARQUIVOS = ["./", "./index.html", "./config.js", "./privacidade.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSAO).then(c => c.addAll(ARQUIVOS))); self.skipWaiting(); });
 self.addEventListener("activate", e => {

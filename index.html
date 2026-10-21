@@ -49,6 +49,11 @@ h2{font-family:var(--serif);font-size:17px;margin:0 0 8px;color:var(--deep)}
 .btn:disabled{opacity:.5}
 a.btn{text-decoration:none}
 nav.inferior:empty{display:none}
+.guia{max-width:560px;margin:8px auto 0}.guia-topo{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.guia-pontos{display:flex;gap:6px;margin:8px 0 12px}.guia-pontos i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.guia-pontos i.feito{background:var(--teal)}.guia-pontos i.atual{background:var(--navy)}
+.guia-card{padding:18px}.guia-card h1{margin:4px 0 8px}.guia-card .passos li{margin-bottom:8px}
+.guia-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 24px}
 .login{max-width:420px;margin:24px auto 0}.login-card{text-align:center;padding:24px 20px}.login-card h1{margin:2px 0 8px}
 .btn.bloco.entrar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;padding:12px 14px;font-size:15px}
 .linkbtn{background:none;border:0;color:var(--teal);font-weight:600;margin-top:14px;cursor:pointer;font-size:14px;text-decoration:underline}
@@ -589,6 +594,129 @@ function iniciarContador(){
   contar(instaladoComoApp()?"/atalho":"/navegador",instaladoComoApp()?"Aberto pelo atalho instalado":"Aberto no navegador");
 }
 
+
+// ---------------------------------------------------------------- guia de configuração (primeiro uso em cada aparelho)
+const GUIA_PASSOS=["Boas-vindas","Pasta no OneDrive","Titular e dependentes","Leitura por IA","Pasta das notas","Atalho","Pronto"];
+let guiaMsg={};   // mensagens de resultado de cada passo (ex.: teste da IA)
+function abrirGuia(){ui.guia=0;guiaMsg={};render();scrollTo(0,0);}
+function guiaIr(n){
+  if(ui.guia===2)guiaSalvarTitular();
+  if(ui.guia===3)guiaSalvarChave(false);
+  ui.guia=Math.max(0,Math.min(GUIA_PASSOS.length-1,n));render();scrollTo(0,0);
+}
+function guiaFechar(){
+  lsSet("guia_ok","1");ui.guia=null;contar("guia-concluido","Concluiu o guia",true);render();scrollTo(0,0);
+  if(NV.conectado())sincronizar(false,true);
+}
+function guiaSalvarTitular(){
+  const n=document.getElementById("gTitNome"),c=document.getElementById("gTitCpf");if(!n)return;
+  const t=D.pessoas.find(p=>p.id==="titular")||D.pessoas[0];if(!t)return;
+  const nome=n.value.trim(),cpf=c.value.trim();
+  if((nome||"Titular")!==t.nome||cpf!==t.cpf){t.nome=nome||"Titular";t.cpf=cpf;D.cadastrosEm=agora();persistir();}  // sem redesenhar: não apaga o que está sendo digitado
+}
+function guiaSalvarChave(avisar){
+  const el=document.getElementById("gChave");if(!el)return;
+  const v=el.value.trim();if(v!==cfg.chave){cfg.chave=v;salvarCfg();}
+}
+async function guiaTestarIa(){
+  guiaSalvarChave();
+  if(!cfg.chave){guiaMsg.ia={ok:false,t:"Cole a chave primeiro."};render();return;}
+  guiaMsg.ia={ok:null,t:"Testando…"};render();
+  try{await iaLer(null);guiaMsg.ia={ok:true,t:"Chave funcionando. A IA já pode ler as suas notas."};contar("ia-ok","Chave de IA testada",true);}
+  catch(e){guiaMsg.ia={ok:false,t:"Não funcionou: "+e.message+" Confira se copiou a chave inteira (começa com AIza)."};}
+  render();
+}
+async function guiaColarChave(){
+  try{const t=(await navigator.clipboard.readText()||"").trim();if(t){document.getElementById("gChave").value=t;guiaSalvarChave();guiaTestarIa();}}
+  catch(e){alert("Não foi possível colar sozinho. Toque no campo e use Colar.");}
+}
+async function guiaCriarPasta(){
+  guiaMsg.pasta={ok:null,t:"Criando a pasta no OneDrive…"};render();
+  try{
+    if(!await NV.pronto(true))throw new Error("Entre com a conta Microsoft.");
+    lsSet("sessao",cfg.nuvem);
+    const t0=Date.now();await sincronizar(true);
+    if(+lsGet("ultima_sinc","0")<t0)throw new Error("Não foi possível falar com o OneDrive. Confira a internet e tente de novo.");
+    guiaMsg.pasta={ok:true,t:"Pasta \""+cfg.pastaApp+"\" pronta no seu OneDrive."};
+  }catch(e){guiaMsg.pasta={ok:false,t:e.message};}
+  render();
+}
+const guiaAviso=m=>m?`<div class="banner ${m.ok===true?"b0":m.ok===false?"b2":"b1"}" style="margin-top:10px"><span>${m.ok===true?"✅ ":m.ok===false?"⚠️ ":"⏳ "}${esc(m.t)}</span></div>`:"";
+function renderGuia(){
+  const n=ui.guia,tot=GUIA_PASSOS.length,c=contaAtual(),nuvemOk=NV.conectado()&&+lsGet("ultima_sinc","0")>0;
+  const pontos=GUIA_PASSOS.map((t,i)=>`<i class="${i<n?"feito":i===n?"atual":""}" title="${esc(t)}"></i>`).join("");
+  let corpo="",prox="Próximo",pular=true;
+  if(n===0){
+    corpo=`<div style="text-align:center"><img src="icon-192.png" alt="" width="64" height="64" style="border-radius:16px"></div>
+      <h1 style="text-align:center">Vamos configurar o app</h1>
+      <p>Em uns 3 minutos o Auxílio-Saúde fica pronto para ler as suas notas sozinho. São 5 passos:</p>
+      <ol class="passos"><li>Criar a pasta <b>${esc(cfg.pastaApp)}</b> no seu OneDrive</li><li>Informar o titular e os dependentes</li><li>Ligar a leitura das notas por IA (gratuita)</li><li>Escolher onde você vai guardar as notas</li><li>Pôr o app na tela inicial</li></ol>
+      ${c.tipo!=="local"?`<p class="muted">Conta conectada: <b>${esc(c.email||c.nome)}</b></p>`:""}`;
+    prox="Começar";pular=false;
+  }else if(n===1){
+    corpo=`<h1>Pasta no OneDrive</h1>
+      <p>Tudo o que você lançar fica guardado na pasta <b>${esc(cfg.pastaApp)}</b> do <b>seu</b> OneDrive: os lançamentos e as fotos das notas, organizadas por ano e mês. Assim você vê os mesmos dados no celular e no computador.</p>
+      ${NV.conectado()?`<button class="btn bloco" onclick="guiaCriarPasta()">${nuvemOk?"🔄 Conferir de novo":"📁 Criar a pasta agora"}</button>`
+        :`<button class="btn bloco" onclick="conectarNuvem()">Entrar com Microsoft</button>`}
+      ${guiaAviso(guiaMsg.pasta||(nuvemOk?{ok:true,t:"Pasta \""+cfg.pastaApp+"\" pronta no seu OneDrive."}:null))}`;
+  }else if(n===2){
+    const t=D.pessoas.find(p=>p.id==="titular")||D.pessoas[0]||{nome:"",cpf:""};
+    const deps=D.pessoas.filter(p=>p!==t);
+    corpo=`<h1>Titular e dependentes</h1>
+      <p>O CPF serve para o app saber de quem é cada nota: a IA lê o CPF impresso e separa os gastos por pessoa.</p>
+      <div class="cols"><label class="campo">Nome do titular<input id="gTitNome" value="${esc(t.nome==="Titular"?"":t.nome)}" placeholder="Seu nome" onchange="guiaSalvarTitular()"></label>
+      <label class="campo">CPF do titular<input id="gTitCpf" inputmode="numeric" value="${esc(t.cpf||"")}" placeholder="000.000.000-00" onchange="guiaSalvarTitular()"></label></div>
+      <h2 style="margin-top:14px">Dependentes</h2>
+      ${deps.length?deps.map(p=>`<div class="item" onclick="guiaSalvarTitular();editarPessoa('${p.id}')"><div class="esq"><div class="nome">${esc(p.nome||"(sem nome)")}</div><div class="top">${esc(p.tipo)}${p.cpf?" · "+esc(p.cpf):""}</div></div><div class="val">›</div></div>`).join(""):`<p class="muted" style="margin-top:0">Nenhum dependente. Se o seu auxílio cobre filhos ou cônjuge, inclua aqui.</p>`}
+      <button class="btn out" style="margin-top:8px" onclick="guiaSalvarTitular();editarPessoa(null)">+ Adicionar dependente</button>`;
+  }else if(n===3){
+    const m=guiaMsg.ia||(cfg.chave?{ok:null,t:"Chave salva. Toque em Testar para conferir."}:null);
+    corpo=`<h1>Leitura das notas por IA</h1>
+      <p>Com a IA, você só fotografa a nota e o app preenche sozinho a data, o valor, a farmácia ou clínica e o CPF. Ela usa o <b>Google Gemini</b>, que é <b>gratuito</b> nesse uso. A chave fica só neste aparelho.</p>
+      <ol class="passos">
+        <li>Toque no botão abaixo. Abre o site do Google numa nova aba.</li>
+        <li>Entre com uma conta Google (Gmail). Se aparecer, aceite os termos.</li>
+        <li>Toque em <b>Create API key</b> (Criar chave de API). Se pedir um projeto, escolha o que aparecer ou crie um.</li>
+        <li>Copie a chave (começa com <b>AIza</b>), volte para cá e toque em <b>Colar e testar</b>.</li>
+      </ol>
+      <a class="btn navy bloco" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">🔑 Abrir o site para criar a chave</a>
+      <label class="campo" style="margin-top:12px">Chave do Gemini<input id="gChave" autocomplete="off" spellcheck="false" value="${esc(cfg.chave)}" placeholder="AIza…" onchange="guiaSalvarChave()"></label>
+      <div class="linha">${navigator.clipboard&&navigator.clipboard.readText?`<button class="btn" onclick="guiaColarChave()">📋 Colar e testar</button>`:""}<button class="btn out" onclick="guiaTestarIa()">Testar</button></div>
+      ${guiaAviso(m)}
+      <p class="muted" style="font-size:13px">Sem a chave o app funciona, mas você digita os dados de cada nota à mão.</p>`;
+  }else if(n===4){
+    const pn=pastaNotas();
+    corpo=`<h1>Onde você vai guardar as notas</h1>
+      <p>Há dois jeitos de mandar uma nota para o app. Use o que preferir:</p>
+      <ol class="passos"><li><b>Pelo app:</b> na tela do mês, toque em <b>📷 Foto da nota</b> ou <b>📄 Arquivos</b>.</li>
+      <li><b>Pelo OneDrive:</b> salve a foto ou o PDF na pasta abaixo, pelo app do OneDrive, pelo e-mail ou pelo computador. O Auxílio-Saúde lê sozinho as notas novas a cada 15 minutos.</li></ol>
+      <label class="campo">Pasta das notas no OneDrive<div class="linha"><input id="cfNotas" style="flex:1" value="${esc(cfg.pastaNotas)}" placeholder="${esc(cfg.pastaApp)}" onchange="cfg.pastaNotas=this.value.trim();salvarCfg()">${NV.conectado()?`<button class="btn out" onclick="escolherPasta('')">Escolher…</button>`:""}</div></label>
+      <p class="muted" style="margin-top:-4px;font-size:13px">Agora: <b>${esc(pn)}</b>. Se deixar em branco, usa a própria pasta ${esc(cfg.pastaApp)}.</p>
+      <label style="display:block;margin-bottom:8px"><input type="checkbox" ${cfg.lerAuto?"checked":""} onchange="cfg.lerAuto=this.checked;salvarCfg()"> Ler sozinho as notas novas dessa pasta</label>
+      <label style="display:block;margin-bottom:8px"><input type="checkbox" ${cfg.organizar?"checked":""} onchange="cfg.organizar=this.checked;salvarCfg()"> Depois de ler, organizar em ${esc(cfg.pastaApp)}/Comprovantes/ano/mês</label>
+      ${cfg.chave?"":`<div class="banner b1"><span>A leitura automática precisa da chave da IA (passo anterior).</span><button class="btn out peq" onclick="guiaIr(3)">Voltar</button></div>`}`;
+  }else if(n===5){
+    corpo=`<h1>Ter o app na tela inicial</h1>
+      <p>Não precisa de loja de aplicativos: o atalho abre o Auxílio-Saúde em tela cheia, como um app, e funciona até sem internet.</p>
+      ${instaladoComoApp()?`<div class="banner b0"><span>✅ Você já está usando o app pelo atalho.</span></div>`:botaoInstalar()}`;
+  }else{
+    corpo=`<h1>Tudo pronto! 🎉</h1>
+      <p>Algumas dicas para o dia a dia:</p>
+      <ol class="passos"><li>Em <b>Mês</b>, informe o <b>valor recebido</b> do auxílio e acompanhe o saldo.</li>
+      <li>Fotografe cada nota assim que pagar, com <b>📷 Foto da nota</b>.</li>
+      <li>Notas lidas pela IA ficam com a etiqueta <b>Conferir</b>: dê uma olhada nos valores.</li>
+      <li>Em <b>Painel</b> e <b>Histórico</b> você vê o ano inteiro para a prestação de contas.</li>
+      <li>Para rever este guia: <b>Ajustes → Guia de configuração</b>.</li></ol>`;
+    prox="Começar a usar";pular=false;
+  }
+  return `<div class="guia"><div class="guia-topo"><span class="muted">Passo ${n+1} de ${tot} · ${esc(GUIA_PASSOS[n])}</span><button class="linkbtn" style="margin:0" onclick="guiaFechar()">Fechar</button></div>
+    <div class="guia-pontos">${pontos}</div>
+    <div class="card guia-card">${corpo}</div>
+    <div class="guia-nav">${n>0?`<button class="btn out" onclick="guiaIr(${n-1})">‹ Voltar</button>`:"<span></span>"}
+      <span style="display:flex;gap:8px">${pular&&n<tot-1?`<button class="linkbtn" style="margin:0" onclick="guiaIr(${n+1})">Pular</button>`:""}
+      <button class="btn" onclick="${n===tot-1?"guiaFechar()":"guiaIr("+(n+1)+")"}">${prox}${n<tot-1?" ›":""}</button></span></div></div>`;
+}
+
 // ---------------------------------------------------------------- sessão: login com a conta Microsoft (OneDrive)
 // Não há servidor: a conta da nuvem é a identidade. Cada pessoa entra com a própria conta e os dados ficam na nuvem dela.
 let instalador=null;
@@ -619,7 +747,7 @@ async function concluirEntrada(){
   contar("entrou","Entrou com a conta Microsoft",true);
   await atualizarLicenca();
   ui.aba="mes";render();
-  if(LIC.liberado)await sincronizar(true,true);
+  if(LIC.liberado)await sincronizar(true,!!lsGet("guia_ok",""));
 }
 function sair(){
   const c=contaAtual(),local=c.tipo==="local";
@@ -640,12 +768,12 @@ function sair(){
 /** Apaga deste aparelho os dados da pessoa que saiu (a nuvem dela não é tocada). */
 async function limparAparelho(){
   try{NV.sair();}catch(e){}
-  for(const k of ["sessao","sessao_pendente","ultima_sinc","ult_leitura","procura_ok","dica_drive","aux_cfg"])lsSet(k,null);
+  for(const k of ["sessao","sessao_pendente","guia_ok","ultima_sinc","ult_leitura","procura_ok","dica_drive","aux_cfg"])lsSet(k,null);
   lsSet("licenca",null);
   await DB.del("kv","dados");await DB.del("kv","mapa");await DB.del("kv","licenca");
   try{const db=await DB.abrir();await new Promise(ok=>{const t=db.transaction("arq","readwrite");t.objectStore("arq").clear();t.oncomplete=ok;t.onerror=ok;});}catch(e){}
   cfg={...CFG_PADRAO};D=vazio();mapa={};
-  ui={...ui,aba:"mes",busca:"",soConferir:false,precisaLogin:false,semAnexo:[]};setStatus("");
+  ui={...ui,aba:"mes",guia:null,busca:"",soConferir:false,precisaLogin:false,semAnexo:[]};setStatus("");
 }
 function botaoInstalar(){
   if(instaladoComoApp())return "";
@@ -1383,7 +1511,7 @@ const ABAS=[["mes","🧾","Mês"],["historico","📅","Histórico"],["painel","�
 const hoje=new Date();
 let ui={aba:"mes",ano:hoje.getFullYear(),mes:hoje.getMonth()+1,anoHist:hoje.getFullYear(),anoPainel:hoje.getFullYear(),busca:"",soConferir:false,precisaLogin:false,semAnexo:[]};
 const $app=()=>document.getElementById("app");
-function abas(){document.getElementById("abas").innerHTML=LIC.liberado&&sessaoAtiva()?ABAS.map(([k,i,t])=>`<button class="${ui.aba===k?"ativo":""}" onclick="irPara('${k}')"><span>${i}</span>${t}</button>`).join(""):"";}
+function abas(){document.getElementById("abas").innerHTML=LIC.liberado&&sessaoAtiva()&&ui.guia==null?ABAS.map(([k,i,t])=>`<button class="${ui.aba===k?"ativo":""}" onclick="irPara('${k}')"><span>${i}</span>${t}</button>`).join(""):"";}
 function irPara(a){ui.aba=a;render();scrollTo(0,0);}
 /** Lista de lançamentos no formato de celular. */
 function tabela(lista,vazioTxt){
@@ -1447,7 +1575,7 @@ function renderHistorico(){
 }
 function renderAjustes(){
   const ult=+lsGet("ultima_sinc","0");
-  let h=`<div class="eyebrow">Configuração</div><h1>Ajustes</h1>`+cardConta();
+  let h=`<div class="eyebrow">Configuração</div><h1>Ajustes</h1>`+cardConta()+`<div class="card"><h2>🧭 Guia de configuração</h2><p class="muted" style="margin-top:0">Passo a passo: pasta no OneDrive, titular e dependentes, chave da IA, pasta das notas e atalho.</p><button class="btn out" onclick="abrirGuia()">Abrir o guia</button></div>`;
   if(LICENCA_ATIVA)h+=`<div class="card"><h2>🔑 Código de acesso</h2><p class="muted" style="margin-top:0">${esc(LIC.texto||"")}</p><button class="btn out" onclick="pedirLicenca()">Informar código de acesso</button></div>`;
   h+=`<div class="card"><h2>☁️ OneDrive</h2>
    <p class="muted" style="margin-top:0">Guarda as notas na pasta <b>${esc(cfg.pastaApp)}</b> do seu OneDrive e mantém os mesmos dados no celular e no computador. Entre com a mesma conta Microsoft em todos.</p>
@@ -1755,6 +1883,8 @@ function render(){
   abas();
   if(!sessaoAtiva()){$app().innerHTML=renderLogin();return;}
   if(!LIC.liberado){$app().innerHTML=renderBloqueio();return;}
+  if(ui.guia==null&&!lsGet("guia_ok","")){if(cfg.chave&&D.lancamentos.length)lsSet("guia_ok","1");else ui.guia=0;}  // quem já usava não vê o guia
+  if(ui.guia!=null){$app().innerHTML=renderGuia();return;}
   const r={mes:renderMes,historico:renderHistorico,painel:renderPainel,ajustes:renderAjustes}[ui.aba];
   $app().innerHTML=r();
 }
