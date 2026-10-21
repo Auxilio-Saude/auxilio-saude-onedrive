@@ -7,7 +7,7 @@ window.AUX_CONFIG = {
      diasTeste: 7,
      vincularEmail: true,
      contato: "Peça o seu código de acesso ao responsável pelo app.",
-     whatsapp: "88993115504",
+     whatsapp: "5588993115504",
      emailContato: "auxiliosaude21@outlook.com",
      goatcounter: "auxiliosaude21"
    };
