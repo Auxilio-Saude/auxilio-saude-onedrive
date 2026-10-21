@@ -5,7 +5,7 @@ window.AUX_CONFIG = {
   msClientId: "279b0b34-27d9-49d0-b772-e567ae4e4bde"
 };  
 window.AUX_CONFIG = {
-     msClientId: "SEU-ID-QUE-JÁ-ESTÁ-LÁ",
+     msClientId: "279b0b34-27d9-49d0-b772-e567ae4e4bde",
      exigirCodigo: true,
      diasTeste: 7,
      vincularEmail: true,
